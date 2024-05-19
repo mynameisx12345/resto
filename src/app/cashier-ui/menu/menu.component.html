@@ -1,0 +1,14 @@
+<div class="menu flex flex-col items-center gap-y-8">
+  <div class="category flex lg:flex-row gap-x-5 sm:flex-col md: flex-col">
+    <button mat-button color="primary"  
+      *ngFor="let category of categories" class="w-44"
+      [class.mat-mdc-unelevated-button]="selectedCategory === category.label"
+      (click)="selectedCategory = category.label">
+      <mat-icon>{{category.icon}}</mat-icon>
+      {{category.label}}
+    </button>
+  </div>
+  <div class="products scrollbox flex flex-wrap items-center gap-5 justify-center p-5">
+    <app-product-card *ngFor="let product of filteredProducts()" [id]="product.id" [image]="product.img" [description]="product.description"  [name]="product.name" [prices]="product.prices" (onAdd)="addOrder($event)"></app-product-card>
+  </div>
+</div>

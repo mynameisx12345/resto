@@ -1,0 +1,16 @@
+.menu-list{
+  .selected{
+    background: white;
+    height: 100%;
+    display: block;
+    width: 400px;
+    border-radius:10px;
+  }
+
+  .menu{
+    overflow: auto;
+    max-width: 800px;
+    border-radius:10px;
+    max-height: calc(100vh - 270px);
+  }
+}

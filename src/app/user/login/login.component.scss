@@ -1,0 +1,28 @@
+.login {
+  .title {
+    font-family: Cooper;
+    font-size: 55px;
+    color: #a02b40;
+  }
+
+  .sub-title {
+    font-family: Script MT;
+    font-size: 60px
+  }
+
+  @media only screen and (max-width: 768px) {
+    .title {
+      font-size: 35px;
+      margin-bottom: 10px;
+    }
+
+    .sub-title {
+      font-size: 37px
+    }
+
+    .logo {
+      height: 70px;
+      width: auto;
+    }
+  }
+}

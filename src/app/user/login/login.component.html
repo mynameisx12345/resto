@@ -1,0 +1,30 @@
+<div class="login flex flex-col items-center justify-center">
+  <div class="flex flex-row items-center mb-10">
+    <img src="../../../assets/images/logo.png" width="100px" height="auto" class="logo" />
+    <div class="flex flex-col items-center lg:gap-y-8">
+      <span class="title"> mammamia </span>
+      <span class="sub-title"> Italian Restaurant </span>
+    </div>
+  </div>
+  <div class="flex flex-col" [formGroup]="fgLogin">
+    <mat-form-field>
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" />
+      <mat-icon matPrefix>person</mat-icon>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Password</mat-label>
+      <input matInput [type]="pwHide ? 'password' : 'text'" formControlName="password" />
+      <mat-icon matPrefix>vpn_key</mat-icon>
+      <button mat-button matSuffix (click)="pwHide = !pwHide">
+        <mat-icon>{{ pwHide ? "visibility" : "visibility_off" }}</mat-icon>
+      </button>
+    </mat-form-field>
+    <div class="flex flex-row justify-between gap-x-5 m-2 mb-4">
+      <button mat-raised-button color="primary" [disabled]="fgLogin.invalid" (click)="login()">Login</button>
+      <button mat-raised-button color="accent">Sign up</button>
+    </div>
+
+    <!-- <button mat-button color="primary">Forgot Password</button> -->
+  </div>
+</div>

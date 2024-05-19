@@ -1,0 +1,46 @@
+.cart{
+  .mat-mdc-table{
+    background: transparent !important;
+    color:black !important;
+    font-size: 12px;
+  }
+
+  .mat-mdc-header-row{
+    color: black;
+  }
+
+  .mat-mdc-row{
+    color: black;
+  }
+
+  .mat-mdc-header-cell{
+    border-bottom-color: black;
+  }
+  .mat-mdc-cell{
+    border-bottom-color: rgb(158, 157, 157);
+  }
+
+  .mat-column-action{
+    max-width: 50px !important;
+  }
+
+  .mat-column-name{
+    min-width: 100px !important;
+  }
+
+  .noOrder{
+    color:gray;
+    font-style: italic;
+  }
+
+  .total{
+    font-size:15px;
+    font-weight: bold;
+  }
+
+  .grand-total{
+    font-size:20px;
+    font-weight: bold;
+    color: #a02b40;
+  }
+}

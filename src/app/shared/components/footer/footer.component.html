@@ -1,0 +1,22 @@
+<div class="footer flex flex-col items-center w-full">
+  <div
+    class="cont flex flex-row gap-x-5 w-full h-full p-5 items-center justify-center"
+    *ngIf="!(noFooter$ | async)"
+  >
+    <button mat-fab color="accent" class="icon-color" aria-label="Home"  matTooltip="Home" (click)="gotoHome()">
+      <mat-icon>home</mat-icon>
+    </button>
+    <button mat-fab color="accent" class="icon-color" matTooltip="Orders" (click)="gotoOrders()">
+      <mat-icon>menu_book</mat-icon>
+    </button>
+    <button mat-fab color="accent" class="icon-color" matTooltip="Kitchen" (click)="gotoKitchen()">
+      <mat-icon>emoji_food_beverage</mat-icon>
+    </button>
+    <button mat-fab color="accent" class="icon-color" matTooltip="Sales and Inventory Reports" (click)="gotoSales()">
+      <mat-icon>bar_chart</mat-icon>
+    </button>
+    <button mat-fab color="accent" class="icon-color" matTooltip="Admin Settings">
+      <mat-icon>admin_panel_settings</mat-icon>
+    </button>
+  </div>
+</div>

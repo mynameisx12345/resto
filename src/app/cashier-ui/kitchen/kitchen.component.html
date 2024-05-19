@@ -1,0 +1,30 @@
+<div class="kitchen w-full flex">
+  <div class="flex flex-wrap">
+    <div
+      class="order m-5"
+      *ngFor="let order of orderList$ | async; let i = index"
+    >
+      <div class="flex flex-col cont paper-shadow">
+        <div class="flex flex-row mb-2 justify-between">
+          <div
+            class="order-number flex flex-col items-center justify-items-center"
+          >
+            <span>{{ i + 1 }}</span>
+          </div>
+          <mat-icon color="warn" class="close" (click)="serve(order)">close</mat-icon>
+        </div>
+        <div class="flex flex-row mb-2">
+          <span class="flex w-1/2">{{ order.orderType ==='dinein' ? 'Dine In' : 'Take Out'}}</span>
+          <span class="flex w-1/2 ml-2">{{ order.cottageParsed }}</span>
+        </div>
+        <div
+          class="item flex flex-row w-full"
+          *ngFor="let item of order.details"
+        >
+          <span class="flex w-3/4">{{ item.name }} {{ item.size }}</span>
+          <span class="flex w-1/4 ml-2">x {{ item.quantity }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

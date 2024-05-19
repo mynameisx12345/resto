@@ -1,0 +1,29 @@
+<div class="product-card flex flex-col p-2 gap-y-2">
+  <div>
+    <img [src]="image || _image" width="190px" height="190px">
+  </div>
+
+  <div class="name">
+    {{name}}
+  </div>
+  
+  <div class="desc">
+    {{description}}
+  </div>
+  <div class="price" [innerHTML]="_price">
+  </div>
+  <div class="add">
+    <button mat-mini-fab color="accent" (click)="addItem(_prices[0].price,'')" *ngIf="_prices.length ===1">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button mat-mini-fab color="accent" [matMenuTriggerFor]="menu" *ngIf="_prices.length > 1">
+      <mat-icon>add</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item *ngFor="let price of _prices" (click)="addItem(price.price, price.size)">
+        <span>{{price?.size}}</span>
+      </button>
+     
+    </mat-menu>
+  </div>
+</div>

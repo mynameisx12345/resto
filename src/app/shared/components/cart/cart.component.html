@@ -1,0 +1,121 @@
+<div class="cart flex flex-col">
+  <span>List of Orders</span>
+  <table mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Item</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.name }} {{ element.size }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="quantity">
+      <th mat-header-cell *matHeaderCellDef>Qty x Price</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.quantity }} x {{ "\u20b1" }}{{ element.price.toFixed(2) }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="price">
+      <th mat-header-cell *matHeaderCellDef>Total</th>
+      <td mat-cell *matCellDef="let element">
+        {{ "\u20b1" }}{{ element.total.toFixed(2) }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button color="warn" (click)="removeOrder(element)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+  <div
+    *ngIf="dataSource.data.length === 0"
+    class="noOrder text-center w-full p-3"
+  >
+    No Orders Yet
+  </div>
+
+  <span class="total mt-4 flex justify-end" *ngIf="dataSource.data.length > 0">
+    Subtotal: {{ "\u20b1" }}{{ (total$ | async)?.toFixed(2) }}
+  </span>
+
+  <div class="flex flex-col mt-4" *ngIf="dataSource.data.length > 0">
+    <div class="flex flex-row gap-x-2 items-center justify-between mt-3">
+      <button
+        mat-button
+        color="primary"
+        class="w-40"
+        (click)="setOrderType('takeout')"
+        [class.mat-mdc-unelevated-button]="orderType === 'takeout'"
+      >
+        Take Out
+      </button>
+      <button
+        mat-button
+        color="primary"
+        class="w-40"
+        (click)="setOrderType('dinein')"
+        [class.mat-mdc-unelevated-button]="orderType === 'dinein'"
+
+      >
+        Dine In
+      </button>
+    </div>
+
+    <div class="w-full" *ngIf="orderType=== 'dinein'">
+      <mat-form-field class="w-full">
+        <mat-label>Cottge/Table</mat-label>
+        <mat-select multiple [formControl]="selectedCottage">
+          @for (cottage of cottages; track cottage) {
+          <mat-option [value]="cottage.id"
+            >{{ cottage.name }} - {{ "\u20b1"
+            }}{{ cottage.price.toFixed(2) }}</mat-option
+          >
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="w-full flex justify-end my-3 grand-total">
+      Grand Total: {{ "\u20b1" }}{{ (grandTotal$ | async)?.toFixed(2) }}
+    </div>
+
+    <div class="flex flex-row gap-x-2 items-center justify-between mt-3" *ngIf="paymentVisibility">
+      <button
+        mat-button
+        color="primary"
+        class="w-40"
+        (click)="setPayMode('paynow')"
+        [class.mat-mdc-unelevated-button]="payMode === 'paynow'"
+      >
+        Pay Now
+      </button>
+      <button
+        mat-button
+        color="primary"
+        class="w-40"
+        (click)="setPayMode('paylater')"
+        [class.mat-mdc-unelevated-button]="payMode === 'paylater'"
+        [disabled]="orderType === 'takeout'"
+      >
+        Pay Later
+      </button>
+    </div>
+    <div class="w-full" [hidden]="!(payMode=== 'paynow' && paymentVisibility)">
+      <mat-form-field class="w-full">
+        <mat-label>Enter Payment Amount</mat-label>
+        <input matInput type="number" [formControl]="paymentAmount">
+      </mat-form-field>
+
+      <div class="w-full flex justify-end total">
+        Change: {{ "\u20b1" }}{{ (change$ | async)?.toFixed(2) }}
+      </div>
+    </div>
+    <div class="w-full mt-3">
+      <button mat-raised-button color="warn" class="w-full" [disabled]="!(orderNowVisibility((change$ | async)))" (click)="orderNow()">ORDER NOW</button>
+    </div>
+  </div>
+</div>

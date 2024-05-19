@@ -1,1 +1,37 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+//@import '~material-design-icons/iconfont/material-icons.css';
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(./assets/fonts/KFOmCnqEu92Fr1Mu72xKOzY.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+  font-family: 'Cooper';
+  font-style: normal;
+  font-weight: 400;
+  src: url(./assets/fonts/COOPBL.TTF) format('truetype');
+}
+
+@font-face {
+  font-family: 'Script MT';
+  font-style: normal;
+  font-weight: 400;
+  src: url(./assets/fonts/Mansions\ Brush\ Script.ttf) format('truetype');
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
