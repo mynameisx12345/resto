@@ -40,4 +40,8 @@ export class FooterComponent {
   gotoSales(){
     this.router.navigate(['/cashier/sales'])
   }
+
+  gotoQr(){
+    this.router.navigate(['/admin/qr'])
+  }
 }

@@ -14,6 +14,9 @@ const routes: Routes = [
     path: 'customer',
     loadChildren: () => import('./customer-ui/customer-ui.module').then(m=>m.CustomerUiModule)
   },
+  {path: 'admin',
+    loadChildren: () => import('./admin/admin.module').then(m=>m.AdminModule)
+  },
   { path: '', redirectTo: '/user/login', pathMatch: 'full' },
 ];
 
