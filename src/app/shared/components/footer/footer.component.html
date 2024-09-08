@@ -9,10 +9,10 @@
     <button mat-fab color="accent" class="icon-color" matTooltip="Orders" (click)="gotoOrders()" *ngIf="(currentUser$ | async)?.userType === 'cashier' || (currentUser$ | async)?.userType === 'admin'">
       <mat-icon>menu_book</mat-icon>
     </button>
-    <button mat-fab color="accent" class="icon-color" matTooltip="Kitchen" (click)="gotoKitchen()" *ngIf="(currentUser$ | async)?.userType === 'kitchen'">
+    <button mat-fab color="accent" class="icon-color" matTooltip="Kitchen" (click)="gotoKitchen()">
       <mat-icon>emoji_food_beverage</mat-icon>
     </button>
-    <button mat-fab color="accent" class="icon-color" matTooltip="Sales and Inventory Reports" (click)="gotoSales()" *ngIf="(currentUser$ | async)?.userType === 'cashier' || (currentUser$ | async)?.userType === 'admin'">
+    <button mat-fab color="accent" class="icon-color" matTooltip="Sales and Inventory Reports" (click)="gotoSales()" *ngIf="(currentUser$ | async)?.userType === 'admin'">
       <mat-icon>bar_chart</mat-icon>
     </button>
     <button mat-fab color="accent" class="icon-color" matTooltip="Admin Settings" (click)="gotoQr()" *ngIf="(currentUser$ | async)?.userType === 'admin'">
