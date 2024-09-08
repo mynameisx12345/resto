@@ -3,20 +3,23 @@
     class="cont flex flex-row gap-x-5 w-full h-full p-5 items-center justify-center"
     *ngIf="!(noFooter$ | async)"
   >
-    <button mat-fab color="accent" class="icon-color" aria-label="Home"  matTooltip="Home" (click)="gotoHome()">
+    <button mat-fab color="accent" class="icon-color" aria-label="Home"  matTooltip="Home" (click)="gotoHome()" *ngIf="(currentUser$ | async)?.userType === 'cashier' || (currentUser$ | async)?.userType === 'admin'">
       <mat-icon>home</mat-icon>
     </button>
-    <button mat-fab color="accent" class="icon-color" matTooltip="Orders" (click)="gotoOrders()">
+    <button mat-fab color="accent" class="icon-color" matTooltip="Orders" (click)="gotoOrders()" *ngIf="(currentUser$ | async)?.userType === 'cashier' || (currentUser$ | async)?.userType === 'admin'">
       <mat-icon>menu_book</mat-icon>
     </button>
-    <button mat-fab color="accent" class="icon-color" matTooltip="Kitchen" (click)="gotoKitchen()">
+    <button mat-fab color="accent" class="icon-color" matTooltip="Kitchen" (click)="gotoKitchen()" *ngIf="(currentUser$ | async)?.userType === 'kitchen'">
       <mat-icon>emoji_food_beverage</mat-icon>
     </button>
-    <button mat-fab color="accent" class="icon-color" matTooltip="Sales and Inventory Reports" (click)="gotoSales()">
+    <button mat-fab color="accent" class="icon-color" matTooltip="Sales and Inventory Reports" (click)="gotoSales()" *ngIf="(currentUser$ | async)?.userType === 'cashier' || (currentUser$ | async)?.userType === 'admin'">
       <mat-icon>bar_chart</mat-icon>
     </button>
-    <button mat-fab color="accent" class="icon-color" matTooltip="Admin Settings" (click)="gotoQr()">
+    <button mat-fab color="accent" class="icon-color" matTooltip="Admin Settings" (click)="gotoQr()" *ngIf="(currentUser$ | async)?.userType === 'admin'">
       <mat-icon>admin_panel_settings</mat-icon>
+    </button>
+    <button mat-fab color="accent" class="icon-color" matTooltip="Logout" (click)="logout()">
+      <mat-icon>logout</mat-icon>
     </button>
   </div>
 </div>

@@ -11,18 +11,31 @@
           >
             <span>{{ i + 1 }}</span>
           </div>
-          <mat-icon color="warn" class="close" (click)="serve(order)">close</mat-icon>
+          <!-- <mat-icon color="warn" class="close" (click)="serve(order)" *ngIf="closePanel(order)">close</mat-icon> -->
         </div>
         <div class="flex flex-row mb-2">
-          <span class="flex w-1/2">{{ order.orderType ==='dinein' ? 'Dine In' : 'Take Out'}}</span>
-          <span class="flex w-1/2 ml-2">{{ order.cottageParsed }}</span>
+          <!-- <span class="flex w-1/2">{{ order.orderType ==='dinein' ? 'Dine In' : 'Take Out'}}</span>
+          <span class="flex w-1/2 ml-2">{{ order.cottageParsed }}</span> -->
+          <span class="flex w-full font-bold">{{order.name}}</span>
         </div>
         <div
           class="item flex flex-row w-full"
-          *ngFor="let item of order.details"
+          *ngFor="let item of order.orderedCottages"
         >
-          <span class="flex w-3/4">{{ item.name }} {{ item.size }}</span>
+          <span class="flex w-3/4" [style]="item.status=== 'Served' ? 'text-decoration: line-through' : ''">{{ item.cottageName || 'Take Out' }} {{ item.size }}</span>
           <span class="flex w-1/4 ml-2">x {{ item.quantity }}</span>
+          <span class="flex w-1/4 ml-2 italic">{{ item.status }}</span>
+          <span class="more-vert"><mat-icon [matMenuTriggerFor]="menu">more_vert</mat-icon></span>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="changeStatus('Preparing', order.name, item)">
+              <mat-icon>mood</mat-icon>
+              Preparing
+            </button>
+            <button mat-menu-item (click)="changeStatus('Served', order.name, item)">
+              <mat-icon>done_outline</mat-icon>
+              Served
+            </button>
+          </mat-menu>
         </div>
       </div>
     </div>

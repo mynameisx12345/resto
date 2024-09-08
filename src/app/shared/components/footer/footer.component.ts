@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
+import { UserService } from '../../../user/user.service';
 
 @Component({
   selector: 'app-footer',
@@ -16,15 +17,19 @@ export class FooterComponent {
       const withoutHeaders = [
         '/user/login',
         '/',
-        ''
+        '',
+        '/customer/customer-menu'
       ];
 
       return withoutHeaders.includes(event.url);
     })
   );
 
+  currentUser$ = this.userService.currentUser$;
+
   constructor(
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly userService: UserService
   ){}
 
   gotoOrders(){
@@ -43,5 +48,9 @@ export class FooterComponent {
 
   gotoQr(){
     this.router.navigate(['/admin/qr'])
+  }
+
+  logout(){
+    this.router.navigate(['/user/login'])
   }
 }

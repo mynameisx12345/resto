@@ -62,6 +62,7 @@ export class MenuListService {
     const currentOrderList: any = this.orderList.value;
     const index = currentOrderList.findIndex((curOrder:OrderList)=>curOrder.id === order.id);
     currentOrderList[index] = order;
+    console.log('curorder', order)
     this.orderList.next(currentOrderList);
   }
 }

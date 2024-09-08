@@ -4,7 +4,8 @@ export interface Orders{
   quantity: number,
   price: number,
   total: number,
-  size: string
+  size: string,
+  status: string
 }
 
 export interface OrderList{
@@ -17,4 +18,18 @@ export interface OrderList{
   paidAmount: number,
   status: string,
   details: Orders[]
+}
+
+export interface ByProductItem{
+  orderId: number,
+    size: string,
+    quantity: number, 
+    cottageName: string,
+    status: string
+}
+
+export interface ByProduct{
+  name: string,
+  orderedCottages: ByProductItem[]
+ 
 }

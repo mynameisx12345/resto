@@ -1,6 +1,6 @@
 .kitchen{
   .order{
-    width: 200px;
+    width: 240px;
     font-size: 14px;
 
     .close{
@@ -23,6 +23,10 @@
     };
     .item{
       border-bottom: 1px solid rgb(167, 165, 165)
+    }
+
+    .more-vert{
+      cursor: pointer;
     }
   }
 

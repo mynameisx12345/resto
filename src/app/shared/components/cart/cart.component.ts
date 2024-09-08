@@ -133,7 +133,9 @@ export class CartComponent implements AfterViewInit, OnDestroy {
         grandTotal: grandTotal,
         paidAmount: paymentAmount || 0,
         status: 'Preparing',
-        details: this.dataSource.data
+        details: this.dataSource.data.map((orders)=> {
+          return {...orders,status:''}
+        })
       }
       return order;
     
