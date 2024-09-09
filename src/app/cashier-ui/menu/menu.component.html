@@ -1,14 +1,44 @@
 <div class="menu flex flex-col items-center gap-y-8">
   <div class="category flex lg:flex-row gap-x-5 sm:flex-col md: flex-col">
-    <button mat-button color="primary"  
-      *ngFor="let category of categories" class="w-44"
-      [class.mat-mdc-unelevated-button]="selectedCategory === category.label"
-      (click)="selectedCategory = category.label">
-      <mat-icon>{{category.icon}}</mat-icon>
-      {{category.label}}
-    </button>
+    <div  *ngFor="let category of categories">
+      <button mat-button color="primary"  [matMenuTriggerFor]="category.label === 'Foods' ? menu : null"
+        class="w-44"
+        [class.mat-mdc-unelevated-button]="selectedCategory === category.label"
+        (click)="changeCategory(category)">
+        <mat-icon>{{category.icon}}</mat-icon>
+        {{category.label}}
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="selectedSubCategory = 'Pizza'">
+          <mat-icon>{{category.icon}}</mat-icon>
+          Pizza
+        </button>
+        <button mat-menu-item (click)="selectedSubCategory = 'Pasta'">
+          <mat-icon>{{category.icon}}</mat-icon>
+          Pasta
+        </button>
+        <button mat-menu-item (click)="selectedSubCategory = 'Others'">
+          <mat-icon>{{category.icon}}</mat-icon>
+          Others
+        </button>
+      </mat-menu>
   </div>
-  <div class="products scrollbox flex flex-wrap items-center gap-5 justify-center p-5">
-    <app-product-card *ngFor="let product of filteredProducts()" [id]="product.id" [image]="product.img" [description]="product.description"  [name]="product.name" [prices]="product.prices" (onAdd)="addOrder($event)"></app-product-card>
+    
+  </div>
+  <div class="products scrollbox items-center justify-center p-5">
+    <div class="flex flex-row w-full" [formGroup]="fgMenu">
+      <mat-form-field *ngIf="!!selectedCategory">
+        <mat-label>
+          Search {{selectedSubCategory}}
+        </mat-label>
+        <input matInput formControlName="searchMenu">
+      </mat-form-field>
+    </div>
+    
+    <div class="flex flex-wrap gap-5 justify-center ">
+    
+      <app-product-card *ngFor="let product of filteredProducts()" [id]="product.id" [image]="product.img" [description]="product.description"  [name]="product.name" [prices]="product.prices" (onAdd)="addOrder($event)"></app-product-card>
+    </div>
+    
   </div>
 </div>
