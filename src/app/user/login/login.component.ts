@@ -30,14 +30,16 @@ export class LoginComponent implements OnInit{
   login(){
     let currentUser = this.userSevice.login(this.fgLogin.get('username').value,this.fgLogin.get('password').value);
     if(currentUser.length > 0){
-      if(currentUser[0].userType === 'kitchen'){
+      if(currentUser[0].userType === 'Kitchen'){
         this.router.navigate(['/cashier/kitchen'])
       } else {
         this.router.navigate(['/cashier/menu'])
       }
       
     } else {
-      this.snackbar.open('Invalid Username and Password')
+      this.snackbar.open('Invalid Username and Password','',{
+        duration:2000
+      })
     }
     
   }

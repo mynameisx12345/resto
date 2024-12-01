@@ -52,5 +52,6 @@ export class FooterComponent {
 
   logout(){
     this.router.navigate(['/user/login'])
+    this.userService.setCurrentUser(null);
   }
 }

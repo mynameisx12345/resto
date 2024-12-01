@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
+import { UserService } from '../../../user/user.service';
 
 @Component({
   selector: 'app-header',
@@ -21,6 +22,8 @@ export class HeaderComponent {
       return withoutHeaders.includes(event.url);
     })
   );
+
+  currentUsr$ = this.userService.currentUser$;
   
   view$ = this.router.events.pipe(
     filter((event)=>event instanceof NavigationEnd),
@@ -45,6 +48,7 @@ export class HeaderComponent {
   )
 
   constructor(
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly userService: UserService
   ){}
 }

@@ -7,9 +7,10 @@
   .products{
     max-height: calc(100vh - 400px) ;
     min-height: calc(100vh - 400px) ;
-    min-width: 200px;
+    min-width: 300px;
     overflow-y: auto;
     z-index: 100;
+    width:100%;
   }
 
   .scrollbox {

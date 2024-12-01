@@ -18,7 +18,7 @@ export class UserService {
      return findUser
   }
 
-  setCurrentUser(user:User){
+  setCurrentUser(user:User | null){
     this.currentUser.next(user);
   }
 }
@@ -30,8 +30,8 @@ export interface User {
 }
 
 const USERS:User[] = [
-  {username:'cashier', password: '12345', userType:'cashier'},
-  {username:'kitchen', password: '12345', userType:'kitchen'},
-  {username:'admin', password: '12345', userType:'admin'}
+  {username:'cashier', password: '12345', userType:'Cashier'},
+  {username:'kitchen', password: '12345', userType:'Kitchen'},
+  {username:'admin', password: '12345', userType:'Administrator'}
 
 ]
