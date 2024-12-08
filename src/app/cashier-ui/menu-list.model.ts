@@ -30,6 +30,13 @@ export interface ByProductItem{
 
 export interface ByProduct{
   name: string,
+  category: string,
+  subCategory?: string,
   orderedCottages: ByProductItem[]
  
+}
+
+export interface OrderByCottage {
+  cottage: string,
+  orderList:any[];
 }

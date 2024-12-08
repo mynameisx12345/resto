@@ -1,5 +1,5 @@
 <div class="orders flex flex-col items-start justify-start">
-  <table mat-table [dataSource]="dataSource">
+  <table mat-table [dataSource]="dataSource" *ngIf="(defaultViewOrder$ | async) === 'table'">
     <ng-container matColumnDef="cottageParsed">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let element">
@@ -60,4 +60,65 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
+
+  <div class="flex flex-wrap" *ngIf="(defaultViewOrder$ | async) === 'card'">
+    <div
+      class="order m-5"
+      *ngFor="let order of ordereListByCottage$  | async; let i = index"
+    >
+      <div class="flex flex-col cont paper-shadow">
+        <div class="flex flex-row mb-2 justify-between">
+          <div
+            class="order-number flex flex-col items-center justify-items-center"
+          >
+            <span>{{ i + 1 }}</span>
+          </div>
+          <!-- <mat-icon color="warn" class="close" (click)="serve(order)" *ngIf="closePanel(order)">close</mat-icon> -->
+        </div>
+        <div class="flex flex-row mb-2">
+          <!-- <span class="flex w-1/2">{{ order.orderType ==='dinein' ? 'Dine In' : 'Take Out'}}</span>
+          <span class="flex w-1/2 ml-2">{{ order.cottageParsed }}</span> -->
+          <span class="flex w-full font-bold">{{order.cottage}}</span>
+         
+        </div>
+        <div class="flex flex-col" *ngFor="let orderList of order.orderList">
+          <span class="order-title">Order # {{orderList.id}}</span>
+          <div
+            class="item flex flex-row w-full"
+            *ngFor="let item of orderList.details"
+          >
+            <span class="flex w-3/4" [style]="item.status=== 'Served' ? 'text-decoration: line-through' : ''">{{ item.name || 'Take Out' }} {{ item.size }}</span>
+            <span class="flex w-2/4 ml-2">x {{ item.quantity }} ({{item.price}})</span>
+            <span class="flex w-1/4 ml-2 italic">{{ item.status }}</span>
+            <!-- <span class="more-vert"><mat-icon [matMenuTriggerFor]="menu">more_vert</mat-icon></span> -->
+            <mat-menu #menu="matMenu">
+              <!-- <button mat-menu-item (click)="changeStatus('Preparing', order.name, item)">
+                <mat-icon>mood</mat-icon>
+                Preparing
+              </button>
+              <button mat-menu-item (click)="changeStatus('Ready to Serve', order.name, item)">
+                <mat-icon>mood</mat-icon>
+                Ready to Serve
+              </button>
+              <button mat-menu-item (click)="changeStatus('Served', order.name, item)">
+                <mat-icon>done_outline</mat-icon>
+                Served
+              </button> -->
+            </mat-menu>
+          </div>
+          <div class="flex flex-col">
+            <span *ngIf="orderList.cottageFee > 0">Cottage Fee: {{ "\u20b1" }}{{orderList.cottageFee}}</span>
+            <span class="font-bold">Total: {{ "\u20b1" }}{{orderList.grandTotal}}</span>
+            <span *ngIf="orderList.paidAmount > 0">Paid Amount: {{ "\u20b1" }}{{orderList.paidAmount}}</span>
+          </div>
+
+          <div class="flex flex-col justify-items-center" *ngIf="orderList.status==='Served'">
+            <button mat-raised-button color="accent" (click)="paid(orderList)">Paid</button>
+          </div>
+        </div>
+        
+        
+      </div>
+    </div>
+  </div>
 </div>

@@ -68,7 +68,7 @@
     <div class="w-full" *ngIf="orderType=== 'dinein'">
       <mat-form-field class="w-full">
         <mat-label>Cottge/Table</mat-label>
-        <mat-select multiple [formControl]="selectedCottage">
+        <mat-select [formControl]="selectedCottage">
           @for (cottage of cottages; track cottage) {
           <mat-option [value]="cottage.id"
             >{{ cottage.name }} - {{ "\u20b1"

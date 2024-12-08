@@ -1,18 +1,20 @@
-<div class="kitchen w-full flex">
-  <div class="flex flex-wrap">
-    <div
+<div class="kitchen w-full flex item-start">
+  <div *ngFor="let category of (categorized$ | async); last as isLast" class="category flex flex-row" [ngClass]="{'category-last-child': isLast}">
+    <div class="flex flex-col">
+      <div class="category-title flex flex-row justify-center">{{category.category}}</div>
+      <div
       class="order m-5"
-      *ngFor="let order of orderList$ | async; let i = index"
+      *ngFor="let order of category.orders; let i = index;"
     >
       <div class="flex flex-col cont paper-shadow">
-        <div class="flex flex-row mb-2 justify-between">
+        <!-- <div class="flex flex-row mb-2 justify-between">
           <div
             class="order-number flex flex-col items-center justify-items-center"
           >
             <span>{{ i + 1 }}</span>
           </div>
-          <!-- <mat-icon color="warn" class="close" (click)="serve(order)" *ngIf="closePanel(order)">close</mat-icon> -->
-        </div>
+          
+        </div> -->
         <div class="flex flex-row mb-2">
           <!-- <span class="flex w-1/2">{{ order.orderType ==='dinein' ? 'Dine In' : 'Take Out'}}</span>
           <span class="flex w-1/2 ml-2">{{ order.cottageParsed }}</span> -->
@@ -43,5 +45,7 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
+ 
 </div>

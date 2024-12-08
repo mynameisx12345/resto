@@ -121,11 +121,17 @@ export class CartComponent implements AfterViewInit, OnDestroy {
 
   currentOrderList: any;
 
+   getRandomIntInclusive =(min:number, max:number)=> {
+    const minCeiled = Math.ceil(min);
+    const maxFloored = Math.floor(max);
+    return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); // The maximum is inclusive and the minimum is inclusive
+  }
+
   orderNow$:Observable<OrderList> = combineLatest([this.selectedCottages$, this.total$,this.cottageTotal$, this.grandTotal$, this.paymentAmount.valueChanges]).pipe(
     takeUntil(this.destroy$),
     map(([cottages,subtotal,cottageFee,grandTotal, paymentAmount])=>{
       const order:OrderList = {
-        id: Math.random(),
+        id: this.getRandomIntInclusive(1000,9000),
         cottage: cottages,
         orderType: this.orderType || '',
         subtotal: subtotal,

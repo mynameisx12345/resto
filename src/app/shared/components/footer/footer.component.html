@@ -12,7 +12,7 @@
     <button mat-fab color="accent" class="icon-color" matTooltip="Kitchen" (click)="gotoKitchen()">
       <mat-icon>emoji_food_beverage</mat-icon>
     </button>
-    <button mat-fab color="accent" class="icon-color" matTooltip="Sales and Inventory Reports" (click)="gotoSales()" *ngIf="(currentUser$ | async)?.userType === 'Administrator'">
+    <button mat-fab color="accent" class="icon-color" matTooltip="Sales and Inventory Reports" (click)="gotoSales()" *ngIf="(currentUser$ | async)?.userType === 'Cashier' || (currentUser$ | async)?.userType === 'Administrator' ">
       <mat-icon>bar_chart</mat-icon>
     </button>
     <button mat-fab color="accent" class="icon-color" matTooltip="Admin Settings" (click)="gotoQr()" *ngIf="(currentUser$ | async)?.userType === 'Administrator'">
