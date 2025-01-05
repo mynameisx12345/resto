@@ -1,4 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-product-card',
@@ -6,13 +8,15 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrl: './product-card.component.scss'
 })
 export class ProductCardComponent {
+
+  @ViewChild('size') size:any;
   @Input() id = '';
   @Input() image: string | null ='../../../../assets/images/placeholder.png';
   @Input() description = '';
   @Input() set prices(data:any){
     this._prices = data;
     data.forEach((price:any, index:any)=>{
-      this._price +=`\u20b1${price.price.toFixed(2)} - ${price.size}\n\n`
+      this._price +=`\u20b1${price.price.toFixed(2)} ${(price.size.length > 0) ? '-' : ''} ${price.size} ${index !== data.length - 1 ? '/  ': ''}`
     })
 
     this._price =this._price.replace("\n", "<br>")
@@ -26,7 +30,37 @@ export class ProductCardComponent {
   _prices:any;
 
 
+
   addItem(price:any, size:string){
-    this.onAdd.emit({id: this.id,name:this.name,quantity:1,price:price,size:size});
+   // this.onAdd.emit({id: this.id,name:this.name,quantity:1,price:price,size:size});
+    this.onAdd.emit({
+      itemId: this.id,
+      itemName:this.name,
+      quantity:1,
+      price:price,
+      itemSize:size
+    });
+    this.snackbar.open(`${this.name} is added to order`,'',{
+      duration:3000,
+      verticalPosition: 'top'
+    })
+  }
+
+  currentDialog?:MatDialogRef<any>;
+  constructor(
+    private readonly dialog: MatDialog,
+    private readonly snackbar: MatSnackBar
+  ){}
+
+  openDialog(){
+    this.currentDialog = this.dialog.open(this.size,{
+  
+    })
+
+    this.currentDialog.afterClosed().subscribe((res)=>{
+      if(res){
+        this.addItem(res.price,res.size)
+      }
+    })
   }
 }

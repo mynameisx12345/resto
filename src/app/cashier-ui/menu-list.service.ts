@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, tap } from 'rxjs';
 import { OrderList, Orders } from './menu-list.model';
+import { environment } from '../../environment/environment';
+import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
 
 
 export class MenuListService {
+  apiUrl = environment.apiUrl;
 
-  constructor() { }
+  constructor(
+    private readonly http: HttpClient
+  ) { }
 
   private orders:BehaviorSubject<any> = new BehaviorSubject([]);
 
@@ -22,7 +27,7 @@ export class MenuListService {
   addNewOrders(newOrder:Orders){
     let currentOrders = this.orders.value;
 
-    const currentItem:Orders = currentOrders.find((order:Orders)=>order.id===newOrder.id && order.size === newOrder.size);
+    const currentItem:Orders = currentOrders.find((order:Orders)=>order.itemId===newOrder.itemId && order.itemSize === newOrder.itemSize);
 
     if(!!currentItem){
       currentItem.quantity++;
@@ -33,7 +38,7 @@ export class MenuListService {
     }
 
     
-    this.orders.next(currentOrders);
+   this.orders.next(currentOrders);
   }
 
   removeOrder(deleteOrder:Orders){
@@ -47,22 +52,59 @@ export class MenuListService {
     this.orders.next([])
   }
 
-  orderList = new BehaviorSubject([]);
+  orderList = new BehaviorSubject<OrderList[]>([]);
   orderList$ = this.orderList.asObservable();
 
   addOrderList(order:OrderList){
-    const currentOrderList:any = this.orderList.value;
-    console.log('listvalue', order)
-    currentOrderList.push(order);
-    this.orderList.next(currentOrderList);
+    return this.addOrderListHttp(order).pipe(
+      tap((_order)=>{
+        console.log('orderres', _order)
+        const currentOrderList:any = this.orderList.value;
+        console.log('listvalue', order)
+        currentOrderList.push(order);
+       // this.orderList.next(currentOrderList);
+      })
+    )
+    
   }
 
   updateOrderList(order:OrderList){
-
+ 
     const currentOrderList: any = this.orderList.value;
     const index = currentOrderList.findIndex((curOrder:OrderList)=>curOrder.id === order.id);
     currentOrderList[index] = order;
-    console.log('curorder', order)
     this.orderList.next(currentOrderList);
+   
+
+    
+  }
+
+  updateOrderListHttp(order:OrderList){
+    return this.http.put(`${this.apiUrl}/orders/header`,order).pipe(
+      tap((res)=>{
+        this.updateOrderList(order);
+      })
+    )
+  }
+
+  addOrderListHttp(order: OrderList){
+    return this.http.post(`${this.apiUrl}/orders`,order);
+  }
+
+  getOrders(){
+    return this.http.get(`${this.apiUrl}/orders/all`).pipe(
+      tap((orders)=>{
+        console.log('orderstosub', orders)
+        this.orderList.next(orders as OrderList[]);
+      })
+    );
+  }
+
+  updateDtlStatus(orderDtl: Orders){
+    return this.http.put(`${this.apiUrl}/orders/detail`,orderDtl)
+  }
+
+  getSalesReport(){
+    return this.http.get(`${this.apiUrl}/orders/sales`);
   }
 }

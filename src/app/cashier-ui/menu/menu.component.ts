@@ -4,6 +4,8 @@ import { take, tap } from 'rxjs';
 import { Orders } from '../menu-list.model';
 import { FormBuilder } from '@angular/forms';
 import { PRODUCTS } from '../../shared/constants/resto.constant';
+import { AdminService, Category, Item } from '../../admin/admin.service';
+import { environment } from '../../../environment/environment';
 
 @Component({
   selector: 'app-menu',
@@ -14,7 +16,8 @@ export class MenuComponent implements OnInit{
 
   constructor(
     private readonly menuService: MenuListService,
-    private readonly fb: FormBuilder
+    private readonly fb: FormBuilder,
+    private readonly adminService: AdminService
   ){}
   
 
@@ -27,6 +30,14 @@ export class MenuComponent implements OnInit{
     { label: 'Desserts', icon: 'icecream' },
   ];
 
+  icon = {
+    'Foods': 'dinner_dining',
+    'Drinks': 'liquor',
+    'Desserts': 'icecream'
+  }
+
+  categories$ = this.adminService.categories$;
+
   subCategories= [
     { label: 'Pizza', icon: 'dinner_dining', category: 'Food'},
     { label: 'Pasta', icon: 'dinner_dining', category: 'Food'},
@@ -35,8 +46,12 @@ export class MenuComponent implements OnInit{
   ]
 
   products = PRODUCTS;
+  items$= this.adminService.items$;
+  items:Item[]=[]
   orders:Orders[] = [];
   fgMenu:any;
+  apiUrl = environment.apiUrl;
+
   ngOnInit(): void {
     this.fgMenu = this.fb.group({
       searchMenu: ['']
@@ -47,24 +62,36 @@ export class MenuComponent implements OnInit{
         this.orders = orders;
       })
     ).subscribe();
+
+    this.items$.pipe(
+      tap((items:Item[])=>{
+        this.items=items;
+      })
+    ).subscribe();
   }
 
   filteredProducts() {
-    return this.products.filter(
-      (product) => product.type === this.selectedCategory && 
-      (this.selectedSubCategory === '' ||(!!this.selectedSubCategory && this.selectedSubCategory === product.subType) ) &&
+    return this.items.filter(
+      (product) => product.categoryName === this.selectedCategory && 
+      (this.selectedSubCategory === '' ||(!!this.selectedSubCategory && this.selectedSubCategory === product.subcategoryName) ) &&
       (this.fgMenu.get('searchMenu').value === '' || (!!this.fgMenu.get('searchMenu').value && product.name.toUpperCase().includes(this.fgMenu.get('searchMenu').value.toUpperCase())))
-    );
+    ).map((product)=>{
+      return {
+        ...product,
+        imageLink: `${this.apiUrl}/images/items/${product.imagePath.split('/').pop()}`
+      }
+    })
   }
 
   orders$ = this.menuService.orders$;
 
   addOrder(item:Orders){
+    console.log('items', item)
    this.menuService.addNewOrders(item);
   }
 
-  changeCategory(category:any){
-    this.selectedCategory = category.label; 
+  changeCategory(category:Category){
+    this.selectedCategory = category.category; 
     this.selectedSubCategory=''
   }
 }

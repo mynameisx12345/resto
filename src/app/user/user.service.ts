@@ -8,7 +8,9 @@ export class UserService {
   currentUser = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUser.asObservable();
 
-  constructor() { }
+  constructor() { 
+    
+  }
 
   login(username:string, password:string){
     let findUser= USERS.filter((user)=>user.username===username && user.password === password)
@@ -20,7 +22,19 @@ export class UserService {
 
   setCurrentUser(user:User | null){
     this.currentUser.next(user);
+
+    localStorage.setItem('user', JSON.stringify(user))
   }
+
+  getCurrentUser(){
+    const parsedUser = localStorage.getItem('user');
+    const currentUser: User = parsedUser? JSON.parse(parsedUser) : null;
+    if(currentUser){
+      this.setCurrentUser(currentUser);
+    }
+  }
+
+
 }
 
 export interface User {

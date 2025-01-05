@@ -1,43 +1,51 @@
 <div class="menu flex flex-col items-center gap-y-8">
-  <div class="category flex lg:flex-row gap-x-5 sm:flex-col md: flex-col">
-    <div  *ngFor="let category of categories">
-      <button mat-button color="primary"  [matMenuTriggerFor]="category.label === 'Foods' ? menu : null"
-        class="w-44"
-        [class.mat-mdc-unelevated-button]="selectedCategory === category.label"
+  <div class="flex flex-wrap justify-center">
+    <div *ngFor="let category of categories$ | async" class="w-44 m-1">
+      <button mat-button color="primary"  
+      [matMenuTriggerFor]="category.subcategories.length > 0  ? menu : null"
+        class="w-44 m-1"
+        [class.mat-mdc-unelevated-button]="selectedCategory === category.category"
         (click)="changeCategory(category)">
-        <mat-icon>{{category.icon}}</mat-icon>
-        {{category.label}}
+        <!-- <mat-icon>{{icon[category.category] ?? icon['Foods']}}</mat-icon> -->
+        {{category.category}}
       </button>
       <mat-menu #menu="matMenu">
-        <button mat-menu-item (click)="selectedSubCategory = 'Pizza'">
-          <mat-icon>{{category.icon}}</mat-icon>
-          Pizza
+        <button mat-menu-item 
+          *ngFor="let subcategory of category.subcategories"
+          (click)="selectedSubCategory = subcategory.subcategory">
+          <!-- <mat-icon>{{category?.icon}}</mat-icon> -->
+          {{subcategory.subcategory}}
         </button>
-        <button mat-menu-item (click)="selectedSubCategory = 'Pasta'">
-          <mat-icon>{{category.icon}}</mat-icon>
+        <!-- <button mat-menu-item (click)="selectedSubCategory = 'Pasta'">
+          <mat-icon>{{category?.icon}}</mat-icon>
           Pasta
         </button>
         <button mat-menu-item (click)="selectedSubCategory = 'Others'">
-          <mat-icon>{{category.icon}}</mat-icon>
+          <mat-icon>{{category?.icon}}</mat-icon>
           Others
-        </button>
+        </button> -->
       </mat-menu>
   </div>
     
   </div>
-  <div class="products scrollbox items-center justify-center p-5">
-    <div class="flex flex-row w-full" [formGroup]="fgMenu">
+  <div class="products scrollbox items-center justify-start p-5 flex flex-col">
+    <div class="flex flex-col w-full" [formGroup]="fgMenu">
       <mat-form-field *ngIf="!!selectedCategory">
         <mat-label>
           Search {{selectedSubCategory}}
         </mat-label>
         <input matInput formControlName="searchMenu">
+        <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
     </div>
     
     <div class="flex flex-wrap gap-5 justify-center ">
-    
-      <app-product-card *ngFor="let product of filteredProducts()" [id]="product.id" [image]="product.img" [description]="product.description"  [name]="product.name" [prices]="product.prices" (onAdd)="addOrder($event)"></app-product-card>
+      <div class="flex flex-col justify-center items-center"  *ngIf="!selectedCategory">
+        <div class="background-text">Select a category above to start your order</div>
+        <img src="../../../assets/images/logo.png" width="100px" height="auto" class="logo" />
+      </div>
+     
+      <app-product-card *ngFor="let product of filteredProducts()" [id]="product.id" [image]="product.imageLink" [description]="product.description"  [name]="product.name" [prices]="product.prices" (onAdd)="addOrder($event)"></app-product-card>
     </div>
     
   </div>

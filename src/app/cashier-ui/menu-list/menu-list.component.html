@@ -1,8 +1,25 @@
-<div class="menu-list flex lg:flex-row gap-x-10 sm:flex-col md:flex-col items-start justfiy-start">
-  <div class="selected p-5">
-    <app-cart></app-cart>
+<div class="menu-list w-full flex lg:flex-row gap-x-10 sm:flex-col md:flex-col items-start justify-between">
+  <div *ngIf="!showCart" class="cart-button">
+    
+    <button mat-fab color="accent" (click)="showCart=true">
+      <mat-icon>shopping_cart_checkout</mat-icon>
+    </button>
+    <div class="counter flex flex-col items-center justify-center" *ngIf="(orders$ | async) > 0">
+      {{orders$ | async}}
     </div>
-  <div class="bg-white p-5 w-3/4">
+  </div>
+  <div class="selected p-5 flex flex-col items-center justfiy-end" *ngIf="showCart">
+    <div class="w-full flex flex-row justify-end items-end">
+      <button mat-button color="warn" (click)="showCart=false">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+   
+    <app-cart></app-cart>
+  </div>
+
+
+  <div class="bg-white p-5" [ngClass]="showCart ? '3/4' : '4/4'">
     <app-menu></app-menu>
   </div>
 </div>

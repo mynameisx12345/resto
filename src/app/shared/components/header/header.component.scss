@@ -17,6 +17,14 @@
     font-size:30px;
     color: #a02b40;
     height: 100px;
+
+    .user-info{
+      height:40px;
+    }
+
+    .controls{
+      height:40px; 
+    }
   }
 
   @media only screen and (max-width: 768px) {

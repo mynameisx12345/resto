@@ -1,19 +1,51 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MenuListService } from '../menu-list.service';
-import { BehaviorSubject, combineLatest, filter, map, switchMap, tap, withLatestFrom } from 'rxjs';
+import { BehaviorSubject, Subject, combineLatest, filter, map, switchMap, takeUntil, tap, withLatestFrom } from 'rxjs';
 import { ByProduct, ByProductItem, OrderList } from '../menu-list.model';
-import { PRODUCTS } from '../../shared/constants/resto.constant';
+import { PRODUCTS, REFRESH_RATE } from '../../shared/constants/resto.constant';
 import { CommonService } from '../../shared/services/common.service';
+import { AdminService, Item } from '../../admin/admin.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import moment from 'moment';
 
 @Component({
   selector: 'app-kitchen',
   templateUrl: './kitchen.component.html',
   styleUrl: './kitchen.component.scss',
 })
-export class KitchenComponent implements OnInit {
+export class KitchenComponent implements OnInit, OnDestroy {
   loadOrderList = new BehaviorSubject(false);
 
   products = PRODUCTS;
+
+  items:Item[] = [];
+
+  onDestroy$ = new Subject;
+
+  loadOrders$ = new BehaviorSubject(false);
+  getOrders$ = this.loadOrders$.pipe(
+    filter(load=>load),
+    switchMap(()=>this.menuService.getOrders()),
+    tap(()=>{
+      this.loadOrders$.next(false);
+    }),
+    takeUntil(this.onDestroy$)
+  )
+
+  selectedOrder:OrderList | null = null;
+
+  queue$:any = this.menuService.orderList$.pipe(
+    map((orderList:OrderList[])=>{
+      return orderList.filter((order:OrderList)=>order.status==='Preparing')
+    }),
+    tap((orderList:OrderList[])=>{
+      console.log('selectedorder', this.selectedOrder)
+      //  if(!this.selectedOrder){
+      //   this.selectedOrder = orderList.length > 0 ?  orderList[0] : null;
+      //  }
+      
+    })
+  );
 
   
 
@@ -24,42 +56,45 @@ export class KitchenComponent implements OnInit {
       const filteredOrderList = orderList.filter(
         (order) => order.status === 'Preparing'
       );
+
+      console.log('orderskit', filteredOrderList)
       //return this.orderList;
       const parsedOrderList = filteredOrderList.map((order: OrderList) => {
-        const cottageParsed = order.cottage
-          .map((cot: any) => cot.name)
-          .join(', ');
-        return { ...order, cottageParsed };
+        // const cottageParsed = order.cottage
+        //   .map((cot: any) => cot.name)
+        //   .join(', ');
+        return { ...order };
       });
 
-      console.log('orders', parsedOrderList);
+      console.log('orders', filteredOrderList);
 
       let viewByProduct: ByProduct[] = [];
       parsedOrderList.forEach((parsedOrder) => {
         parsedOrder.details.forEach((detail) => {
           const isExist = viewByProduct.find(
-            (byProduct) => byProduct.name === detail.name
+            (byProduct) => byProduct.id === detail.itemId
           );
           if (isExist) {
             isExist.orderedCottages.push({
               orderId: parsedOrder.id,
-              size: detail.size,
+              size: detail.itemSize,
               quantity: detail.quantity,
-              cottageName: parsedOrder.cottageParsed,
+              cottageName: parsedOrder.area || '',
               status: detail.status
             });
           } else {
-            const productInfo = this.products.find(product=>product.id === detail.id);
+            const productInfo = this.items.find(product=>product.id === detail.itemId);
             viewByProduct.push({
-              name: detail.name,
-              category: productInfo?.type || '',
-              subCategory: productInfo?.subType || '',
+              id: detail.itemId,
+              name: detail.itemName,
+              category: productInfo?.categoryName || '',
+              subCategory: productInfo?.subcategoryName || '',
               orderedCottages: [
                 {
                   orderId: parsedOrder.id,
-                  size: detail.size,
+                  size: detail.itemSize,
                   quantity: detail.quantity,
-                  cottageName: parsedOrder.cottageParsed,
+                  cottageName: parsedOrder.area || '',
                   status: detail.status
                 },
               ],
@@ -78,6 +113,8 @@ export class KitchenComponent implements OnInit {
   categorized$:any = this.orderList$.pipe(
     withLatestFrom(this.commonService.kitchenCategory$),
     map(([orders,categories]:any[])=>{
+
+      console.log('kit123', orders,categories)
       
       let categorized:any = [];
       categories.forEach((category:any)=>{
@@ -104,38 +141,93 @@ export class KitchenComponent implements OnInit {
     })
   )
   constructor(private readonly menuService: MenuListService, 
-    private readonly commonService: CommonService) {}
+    private readonly commonService: CommonService,
+    private readonly adminService: AdminService,
+    private readonly snackbar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
-      this.loadOrderList.next(true);
+      //this.loadOrderList.next(true);
+
+      this.getOrders$.subscribe()
+      this.loadOrders$.next(true);
+
+      setInterval(()=>{
+       // this.loadOrderList.next(true);
+        this.loadOrders$.next(true);
+      },REFRESH_RATE)
+
+      this.adminService.items$.pipe(
+        takeUntil(this.onDestroy$),
+        tap((items)=>{
+          console.log('items',items)
+          this.items = items;
+        })
+      ).subscribe();
   }
 
-  serve(order: OrderList) {
+  ngOnDestroy(): void {
+    this.onDestroy$.next(true);
+    this.onDestroy$.complete();
+  }
+
+  serve$(order: OrderList) {
     order.status = 'Served';
-    this.menuService.updateOrderList(order);
+    return this.menuService.updateOrderList(order);
   }
 
   changeStatus(status: string, product: string, cottageInfo: ByProductItem) {
+    
     let order = this.orders?.find((order) => order.id === cottageInfo.orderId);
     if (order) {
       let orderItem = order?.details.find(
-        (det) => det.name === product && det.size === cottageInfo.size
+        (det) => det.itemId == product && det.itemSize === cottageInfo.size
       );
+      console.log('order123', order,orderItem)
       if (orderItem) {
         orderItem.status = status;
+        this.menuService.updateDtlStatus(orderItem).pipe(
+          takeUntil(this.onDestroy$),
+          tap((res:any)=>{
+            
+
+
+
+            this.snackbar.open(`${orderItem.itemName}'s status is ${status}`,'',{
+              duration:3000,
+              verticalPosition:'top'
+            });
+
+            let isAllServed = res?.isHeaderServed
+            if(isAllServed){
+              order.status='Served';
+            }
+            this.menuService.updateOrderList(order);
+            this.loadOrderList.next(true);
+          })
+        ).subscribe()
       }
 
-      let isAllServed = order.details.filter((det)=>det.status !== 'Served').length === 0
-      console.log('ordertoupdate', order);
-      if(isAllServed){
-        order.status='Served';
-      }
-      this.menuService.updateOrderList(order);
-      this.loadOrderList.next(true);
+
+      
     }
   }
 
   closePanel(order:ByProduct){
     return order.orderedCottages.filter(ord=>ord.status!== 'Served').length === 0
+  }
+
+  selectQueue(order:OrderList){
+    console.log('selected', this.selectedOrder, order)
+    if(this.selectedOrder?.id === order.id){
+      console.log('selected null')
+      this.selectedOrder = null
+    } else {
+      this.selectedOrder = order;
+    }
+  }
+
+  tooltipShow(order:OrderList){
+    return `Time Ordered: ${moment(order.dttmOrder).format('hh:mm A')}`
   }
 }

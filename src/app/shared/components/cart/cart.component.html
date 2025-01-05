@@ -1,10 +1,10 @@
 <div class="cart flex flex-col">
   <span>List of Orders</span>
   <table mat-table [dataSource]="dataSource">
-    <ng-container matColumnDef="name">
+    <ng-container matColumnDef="itemName">
       <th mat-header-cell *matHeaderCellDef>Item</th>
       <td mat-cell *matCellDef="let element">
-        {{ element.name }} {{ element.size }}
+        {{ element.itemName }} {{ element.itemSize }}
       </td>
     </ng-container>
     <ng-container matColumnDef="quantity">
@@ -43,7 +43,7 @@
   </span>
 
   <div class="flex flex-col mt-4" *ngIf="dataSource.data.length > 0">
-    <div class="flex flex-row gap-x-2 items-center justify-between mt-3">
+    <div class="flex flex-row gap-x-2 items-center justify-between mt-3" *ngIf="!isCustomerOrder">
       <button
         mat-button
         color="primary"
@@ -65,7 +65,7 @@
       </button>
     </div>
 
-    <div class="w-full" *ngIf="orderType=== 'dinein'">
+    <div class="w-full" *ngIf="orderType=== 'dinein' && !isCustomerOrder">
       <mat-form-field class="w-full">
         <mat-label>Cottge/Table</mat-label>
         <mat-select [formControl]="selectedCottage">
@@ -83,7 +83,7 @@
       Grand Total: {{ "\u20b1" }}{{ (grandTotal$ | async)?.toFixed(2) }}
     </div>
 
-    <div class="flex flex-row gap-x-2 items-center justify-between mt-3" *ngIf="paymentVisibility">
+    <div class="flex flex-row gap-x-2 items-center justify-between mt-3" *ngIf="paymentVisibility && !isCustomerOrder">
       <button
         mat-button
         color="primary"
@@ -104,18 +104,22 @@
         Pay Later
       </button>
     </div>
-    <div class="w-full" [hidden]="!(payMode=== 'paynow' && paymentVisibility)">
+    <div class="w-full" [hidden]="!(payMode=== 'paynow' && paymentVisibility)" *ngIf="!isCustomerOrder">
       <mat-form-field class="w-full">
         <mat-label>Enter Payment Amount</mat-label>
         <input matInput type="number" [formControl]="paymentAmount">
       </mat-form-field>
 
-      <div class="w-full flex justify-end total">
+      <div class="w-full flex justify-end total" [hidden]="((change$ | async) || 0) <= 0" *ngIf="!isCustomerOrder"
+      [style.visibility]="((change$ | async) || 0) > 0 ? 'visible': 'hidden'">
         Change: {{ "\u20b1" }}{{ (change$ | async)?.toFixed(2) }}
       </div>
     </div>
     <div class="w-full mt-3">
       <button mat-raised-button color="warn" class="w-full" [disabled]="!(orderNowVisibility((change$ | async)))" (click)="orderNow()">ORDER NOW</button>
     </div>
+    <!-- <div class="w-full mt-3">
+      <button mat-raised-button color="warn" class="w-full"  (click)="orderNow()" *ngIf="isCustomerOrder">ORDER NOW</button>
+    </div> -->
   </div>
 </div>

@@ -1,9 +1,8 @@
 .menu-list{
-  width:95vw;
+  padding:10px;
   .selected{
     background: white;
     height: 100%;
-    display: block;
     width: 400px;
     border-radius:10px;
   }
@@ -14,4 +13,26 @@
     border-radius:10px;
     max-height: 100%;
   }
+
+  .example-container {
+    height:100%
+  }
+
+  .cart-button{
+    position:relative;
+    .counter{
+      border-radius:50%;
+      background:red;
+      height:25px;
+      width:25px;
+      font-size:13px;
+      color:white;
+      position:absolute;
+      top:0;
+      right:0;
+      margin-top:-10px;
+      font-weight: bold;
+    }
+  }
+
 }

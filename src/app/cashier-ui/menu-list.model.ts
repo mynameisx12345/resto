@@ -1,34 +1,43 @@
 export interface Orders{
   id:string,
-  name: string,
   quantity: number,
   price: number,
   total: number,
-  size: string,
-  status: string
+  status: string,
+  itemId: any,
+  itemName: string,
+  itemSize: string,
+  orderHdrId: any
 }
 
 export interface OrderList{
-  id: any,
+  id?: any,
   cottage: any,
-  orderType: string,
-  subtotal: number,
+  orderType?: string,
+  subTotal: number,
   cottageFee: number,
   grandTotal: number,
   paidAmount: number,
   status: string,
-  details: Orders[]
+  details: Orders[],
+  mode?: 'dinein'| 'takeout', //orderType
+  area?: string,
+  areaFee?:number, // cottageFee
+  discount?:number,
+  payMode?: 'paynow' | 'paylater',
+  dttmOrder?: string,
 }
 
 export interface ByProductItem{
   orderId: number,
-    size: string,
-    quantity: number, 
-    cottageName: string,
-    status: string
+  size: string,
+  quantity: number, 
+  cottageName: string,
+  status: string
 }
 
 export interface ByProduct{
+  id:any,
   name: string,
   category: string,
   subCategory?: string,

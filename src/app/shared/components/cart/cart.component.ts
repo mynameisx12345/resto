@@ -5,7 +5,9 @@ import { Observable, Subject, combineLatest, filter, lastValueFrom, map, merge, 
 import { OrderList, Orders } from '../../../cashier-ui/menu-list.model';
 import { FormControl } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { COTTAGES } from '../../constants/resto.constant';
+import { CottageI } from '../../models/resto.model';
 
 @Component({
   selector: 'app-cart',
@@ -20,18 +22,14 @@ export class CartComponent implements AfterViewInit, OnDestroy {
       return orders.reduce((partialSum, order) => partialSum + order.total, 0);
     })
   );
-  cottages = [
-    { id: '1', name: 'Cottage 1', price: 150 },
-    { id: '2', name: 'Cottage 2', price: 200 },
-    { id: '3', name: 'Cottage 3', price: 100 },
-    { id: '4', name: 'Table 1', price: 0 },
-    { id: '5', name: 'Table 2', price: 0 },
-    { id: '6', name: 'Table 3', price: 0 },
-  ];
+  cottages = COTTAGES;
 
-  orderType: 'takeout' | 'dinein' | null = null;
+  orderType: 'takeout' | 'dinein'  | null = null;
   selectedCottage = new FormControl('');
-  paymentAmount = new FormControl(0);
+  paymentAmount = new FormControl();
+
+  isCustomerOrder = false;
+  customerCottage:CottageI[] = [];
 
   selectedCottages$ = this.selectedCottage.valueChanges.pipe(
     map((selected) => {
@@ -41,7 +39,6 @@ export class CartComponent implements AfterViewInit, OnDestroy {
     }),
     startWith([])
   );
-
 
   cottageTotal$ = this.selectedCottage.valueChanges.pipe(
     map((selected) => {
@@ -72,15 +69,18 @@ export class CartComponent implements AfterViewInit, OnDestroy {
   constructor(
     private readonly menuService: MenuListService,
     private readonly snackbr: MatSnackBar,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
   ) {}
 
+
   dataSource = new MatTableDataSource<Orders>();
-  displayedColumns = ['name', 'quantity', 'price', 'action'];
+  displayedColumns = ['itemName', 'quantity', 'price', 'action'];
 
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.orders$.subscribe((orders: Orders[]) => {
+        console.log('orders1',orders)
         this.dataSource.data = orders;
       });
     }, 0);
@@ -88,6 +88,22 @@ export class CartComponent implements AfterViewInit, OnDestroy {
     this.orderNow$.subscribe((orders)=>{
       this.currentOrderList = orders;
     });
+    console.log('router', this.router.url);
+
+    if(this.router.url === '/cashier/menu'){
+      this.isCustomerOrder = false
+    } else {
+      this.isCustomerOrder = true;
+      this.setOrderType('dinein');
+      this.setPayMode('paylater')
+    }
+
+    this.route.queryParams.subscribe((param:any)=>{
+      this.customerCottage = this.cottages.filter((cottage)=>cottage.id === param.id)
+      console.log('customercottage', this.customerCottage)
+    })
+
+
   }
 
   removeOrder(order: Orders) {
@@ -107,7 +123,7 @@ export class CartComponent implements AfterViewInit, OnDestroy {
   }
 
   setPayMode(type:any){
-    this.paymentAmount.setValue(0);
+    this.paymentAmount.setValue(null);
     this.payMode = type;
   }
 
@@ -130,26 +146,35 @@ export class CartComponent implements AfterViewInit, OnDestroy {
   orderNow$:Observable<OrderList> = combineLatest([this.selectedCottages$, this.total$,this.cottageTotal$, this.grandTotal$, this.paymentAmount.valueChanges]).pipe(
     takeUntil(this.destroy$),
     map(([cottages,subtotal,cottageFee,grandTotal, paymentAmount])=>{
+      console.log('cottages', cottages, this.dataSource.data)
+      const _cottages = this.isCustomerOrder ? this.customerCottage : cottages;
+      const _orderType = this.isCustomerOrder ? 'dinein' : this.orderType;
       const order:OrderList = {
-        id: this.getRandomIntInclusive(1000,9000),
-        cottage: cottages,
-        orderType: this.orderType || '',
-        subtotal: subtotal,
+        cottage: _cottages,
+        subTotal: subtotal,
         cottageFee: cottageFee,
         grandTotal: grandTotal,
         paidAmount: paymentAmount || 0,
         status: 'Preparing',
+        mode: _orderType as 'dinein' | 'takeout',
+        area: _cottages.length > 0 ? _cottages[0].name : '',
+        areaFee: cottageFee,
+        discount: 0,
+        payMode: this.payMode as 'paynow' | 'paylater',
         details: this.dataSource.data.map((orders)=> {
           return {...orders,status:''}
         })
       }
+
+      console.log('ordernow', order)
       return order;
     
     }),
   )
 
   orderNow(){
-    this.menuService.addOrderList(this.currentOrderList);
+    console.log('orderlist', this.currentOrderList)
+    this.menuService.addOrderList(this.currentOrderList).subscribe();
     this.menuService.clearOrders();
     this.orderType = null;
     this.payMode = null;
@@ -160,8 +185,14 @@ export class CartComponent implements AfterViewInit, OnDestroy {
       duration:3000,
       verticalPosition: 'top'
     });
+
+    if(this.router.url==='/cashier/menu'){
+      this.router.navigate(['/cashier/orders']);
+
+    } else {
+      this.router.navigate(['/customer/customer-home'],{queryParams: {id:this.customerCottage[0].id}});
+    }
     
-    this.router.navigate(['/cashier/orders']);
 
   }
 

@@ -6,7 +6,11 @@
       <span class="sub-title"> Italian Restaurant </span>
     </div>
   </div>
-  <div class="view flex flex-col items-center justify-center mr-10">
-    <span>{{(currentUsr$  | async)?.userType}}</span>
+  <div class="view flex flex-col items-end mr-10">
+    <div class="user-info flex flex-row items-end justify-end">{{(currentUsr$  | async)?.userType}}</div>
+    <div class="controls" *ngIf="!isMobile">
+      <app-footer></app-footer>
+    </div>
+    
   </div>
 </div>

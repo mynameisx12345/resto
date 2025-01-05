@@ -1,0 +1,137 @@
+<div class="items flex flex-col items-start justify-start">
+    <div class="w-full flex flex-row justify-between items-center">
+        <button mat-raised-button (click)="openDialog()" color="accent">Add Item</button>
+        <mat-form-field>
+            <mat-label>Filter</mat-label>
+            <input matInput (keyup)="applyFilter($event)" #input>
+          </mat-form-field>
+    </div>
+    
+    <div class="flex flex-col">
+        <table mat-table [dataSource]="dataSource" matSort >
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.name}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.description}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="categoryName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.categoryName}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="subcategoryName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Sub Category</th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.subcategoryName}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="imagePath">
+                <th mat-header-cell *matHeaderCellDef>Image</th>
+                <td mat-cell *matCellDef="let element">
+                    <button mat-button (click)="viewImage(element.imagePath)" [disabled]="!element.imagePath">View</button>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="menu">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button [matMenuTriggerFor]="subMenu"><mat-icon>more_vert</mat-icon></button>
+                    <mat-menu #subMenu="matMenu">
+                        <button mat-menu-item (click)="editItem(element)">
+                            <mat-icon>edit</mat-icon>
+                            Edit
+                        </button>
+                        <button mat-menu-item (click)="removeItem(element)">
+                            <mat-icon>delete</mat-icon>
+                            Remove
+                        </button>
+                    </mat-menu>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[10, 25, 100]" aria-label="Select page of items"></mat-paginator>
+    </div>
+    
+</div>
+
+<ng-template #addItem>
+    <div class="m-5">
+        <form [formGroup]="fgItem" enctype="multipart/form-data" (submit)="currentDialog?.close(true)" class="flex flex-col">
+            <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Description</mat-label>
+                <input matInput formControlName="description">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Category</mat-label>
+                <mat-select formControlName="categoryId">
+                    <mat-option *ngFor="let category of categories$ | async" [value]="category.id">{{category.category}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Sub Category</mat-label>
+                <mat-select formControlName="subcategoryId"  [disabled]="subcategories.length === 0">
+                    <mat-option *ngFor="let subcategory of subcategories" [value]="subcategory?.id">{{subcategory?.subcategory}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <button type="button" mat-raised-button (click)="fileInput.click()" color="accent">Choose Image</button>
+            <input hidden (change)="onFileSelected($event)" #fileInput type="file" accept="image/png, image/gif, image/jpeg" />
+            <span class="file-name">{{selectedFile?.name}}</span>
+            
+            <div class="prices mt-5 flex flex-col">
+                <button type="button" mat-raised-button color="primary" (click)="addPrice()">Add Price</button>
+                <table mat-table [dataSource]="dataSourcePrices">
+                   
+                    <ng-container matColumnDef="size">
+                        <th mat-header-cell *matHeaderCellDef>Size</th>
+                        <td mat-cell *matCellDef="let element">
+                            <mat-form-field>
+                                <input matInput (keyup)="editField(element,'size', $event)" [value]="element.size">
+                            </mat-form-field>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="price">
+                        <th mat-header-cell *matHeaderCellDef>Price</th>
+                        <td mat-cell *matCellDef="let element">
+                            <mat-form-field>
+                                <input matInput type="number" (keyup)="editField(element,'price', $event)" min="0" [value]="element.price">
+                            </mat-form-field>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="menu">
+                        <th mat-header-cell *matHeaderCellDef></th>
+                        <td mat-cell *matCellDef="let element">
+                            <button type="button" [matMenuTriggerFor]="subMenu"><mat-icon>more_vert</mat-icon></button>
+                            <mat-menu #subMenu="matMenu">
+                                <button mat-menu-item (click)="removePrice(element)">
+                                    <mat-icon>delete</mat-icon>
+                                    Remove
+                                </button>
+                            </mat-menu>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayColumnsPrice"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayColumnsPrice"></tr>
+                </table>"
+            </div>
+            
+            <div class="flex flex-row justify-between mt-5">
+                <button mat-raised-button type="submit" color="primary" [disabled]="!fgItem.valid || dataSourcePrices.data.length === 0 || (dataSourcePrices.data.length > 0 && !dataSourcePrices.data[0].price) ">Save</button>
+                <button mat-raised-button type="button" color="warn" (click)="currentDialog?.close(false); resetForm()">Close</button>
+            </div>
+            
+        </form>
+    </div>
+</ng-template>

@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 
-import { NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { UserService } from '../../../user/user.service';
+import { checkIfMobile } from '../../util';
 
 @Component({
   selector: 'app-footer',
@@ -16,21 +17,40 @@ export class FooterComponent {
     map((event: any) => {
       const withoutHeaders = [
         '/user/login',
-        '/',
-        '',
-        '/customer/customer-menu'
+        '/customer/customer-home',
+        '/customer/customer-menu',
+        '/customer/customer-order'
+
       ];
 
-      return withoutHeaders.includes(event.url);
+      
+
+      const yesWithout = withoutHeaders.some((url)=>{
+        console.log('events1', url, event.url.search(url))
+        return event.url.search(url) >= 0
+      })
+
+      console.log('events', event.url, yesWithout)
+
+      return yesWithout;
     })
   );
 
+  
+
   currentUser$ = this.userService.currentUser$;
+
+  isMobile = checkIfMobile();
 
   constructor(
     private readonly router: Router,
-    private readonly userService: UserService
-  ){}
+    private readonly userService: UserService,
+    private readonly route: ActivatedRoute
+  ){
+    this.route.url.subscribe((url)=>{
+      console.log('url', url)
+    })
+  }
 
   gotoOrders(){
     this.router.navigate(['/cashier/orders'])
@@ -53,5 +73,9 @@ export class FooterComponent {
   logout(){
     this.router.navigate(['/user/login'])
     this.userService.setCurrentUser(null);
+  }
+
+  goToLink(link:string){
+    this.router.navigate([link]);
   }
 }

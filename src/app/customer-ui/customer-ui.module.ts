@@ -5,17 +5,28 @@ import { ModulesModule } from '../shared/modules/modules.module';
 import { ComponentsModule } from '../shared/components/components.module';
 import { RouterModule, Routes } from '@angular/router';
 import { CashierUiModule } from '../cashier-ui/cashier-ui.module';
+import { CustomerHomeComponent } from './customer-home/customer-home.component';
+import { OrdersComponent } from '../cashier-ui/orders/orders.component';
 
 const routes: Routes = [
   {
     path: 'customer-menu',
     component: CustomerMenuComponent
+  },
+  {
+    path: 'customer-home',
+    component: CustomerHomeComponent
+  },
+  {
+    path: 'customer-order',
+    component: OrdersComponent
   }
 ]
 
 @NgModule({
   declarations: [
-    CustomerMenuComponent
+    CustomerMenuComponent,
+    CustomerHomeComponent
   ],
   imports: [
     CommonModule,

@@ -1,4 +1,4 @@
-<div class="product-card flex flex-col p-2 gap-y-2">
+<div class="product-card flex flex-col p-2 gap-y-2 justify-between">
   <div class="imgCont">
     <img [src]="image || _image">
   </div>
@@ -12,18 +12,25 @@
   </div>
   <div class="price" [innerHTML]="_price">
   </div>
-  <div class="add">
-    <button mat-mini-fab color="accent" (click)="addItem(_prices[0].price,'')" *ngIf="_prices.length ===1">
-      <mat-icon>add</mat-icon>
+  <div class="flex flex-col space-y-2">
+    <!-- <button mat-raised-button color="accent" (click)="addItem(_prices[0].price,'')" *ngIf="_prices.length ===1">
+      <mat-icon>add</mat-icon> Add 
     </button>
-    <button mat-mini-fab color="accent" [matMenuTriggerFor]="menu" *ngIf="_prices.length > 1">
-      <mat-icon>add</mat-icon>
+    <button mat-raised-button color="primary" *ngIf="_prices.length > 1" (click)="openDialog()" >
+      <mat-icon>add</mat-icon> Add
+    </button> -->
+
+    <button mat-raised-button color="accent" *ngFor="let _price of _prices" (click)="addItem(_price.price,_price.size)">
+      <mat-icon>add</mat-icon> Add {{_price.size}}
     </button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item *ngFor="let price of _prices" (click)="addItem(price.price, price.size)">
-        <span>{{price?.size}}</span>
-      </button>
-     
-    </mat-menu>
+
+  
   </div>
 </div>
+
+<ng-template #size>
+  <div class="m-1 flex flex-col justify-center items-center priceDiag space-y-2">
+    <button mat-raised-button class="button-select" color="accent" *ngFor="let priceA of _prices" (click)="currentDialog?.close({price:priceA.price,size:priceA.size})">{{priceA.size}}</button>
+  </div>
+</ng-template>
+

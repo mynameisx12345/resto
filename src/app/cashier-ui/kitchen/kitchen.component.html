@@ -1,4 +1,18 @@
-<div class="kitchen w-full flex item-start">
+
+<div class="kitchen flex flex-col item-start">
+  <div class="queue w-full border-solid flex flex-col flex-wrap">
+      <!-- <div *ngFor="let queue of (queue$ | async)" class="queue-order"> -->
+        <!-- <button mat-raised-button color="accent">Order #{{queue.id}} {{queue.area ? queue.area : 'Take Out'}}</button> -->
+        <mat-chip-listbox class="queue-order  flex flex-col">
+          <mat-chip-option *ngFor="let queue of (queue$ | async); let i = index" color="accent" [selected]="selectedOrder?.id === queue.id"
+            (click)="selectQueue(queue)"
+            [matTooltip]="tooltipShow(queue)">
+            Order #{{queue.id}} {{queue.area ? queue.area : 'Take Out'}}
+          </mat-chip-option>
+        </mat-chip-listbox >
+      <!-- </div> -->
+  </div>
+ <div class="flex item-start">
   <div *ngFor="let category of (categorized$ | async); last as isLast" class="category flex flex-row" [ngClass]="{'category-last-child': isLast}">
     <div class="flex flex-col">
       <div class="category-title flex flex-row justify-center">{{category.category}}</div>
@@ -21,23 +35,24 @@
           <span class="flex w-full font-bold">{{order.name}}</span>
         </div>
         <div
-          class="item flex flex-row w-full"
+          class="item flex flex-row w-full justify-center items-center"
           *ngFor="let item of order.orderedCottages"
+          [ngClass]="item.orderId === selectedOrder?.id ? 'item-selected' : 'item'"
         >
           <span class="flex w-3/4" [style]="item.status=== 'Served' ? 'text-decoration: line-through' : ''">{{ item.cottageName || 'Take Out' }} {{ item.size }}</span>
           <span class="flex w-1/4 ml-2">x {{ item.quantity }}</span>
           <span class="flex w-1/4 ml-2 italic">{{ item.status }}</span>
           <span class="more-vert"><mat-icon [matMenuTriggerFor]="menu">more_vert</mat-icon></span>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="changeStatus('Preparing', order.name, item)">
+            <button mat-menu-item (click)="changeStatus('Preparing', order.id, item)">
               <mat-icon>mood</mat-icon>
               Preparing
             </button>
-            <button mat-menu-item (click)="changeStatus('Ready to Serve', order.name, item)">
+            <button mat-menu-item (click)="changeStatus('Ready to Serve', order.id, item)">
               <mat-icon>mood</mat-icon>
               Ready to Serve
             </button>
-            <button mat-menu-item (click)="changeStatus('Served', order.name, item)">
+            <button mat-menu-item (click)="changeStatus('Served', order.id, item)">
               <mat-icon>done_outline</mat-icon>
               Served
             </button>
@@ -47,5 +62,7 @@
     </div>
     </div>
   </div>
+ </div>
+ 
  
 </div>

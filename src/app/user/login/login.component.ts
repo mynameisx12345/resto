@@ -38,7 +38,8 @@ export class LoginComponent implements OnInit{
       
     } else {
       this.snackbar.open('Invalid Username and Password','',{
-        duration:2000
+        duration:2000,
+        verticalPosition: 'top'
       })
     }
     
