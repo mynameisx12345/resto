@@ -17,7 +17,7 @@ export class KitchenComponent implements OnInit, OnDestroy {
   loadOrderList = new BehaviorSubject(false);
 
   products = PRODUCTS;
-
+ //
   items:Item[] = [];
 
   onDestroy$ = new Subject;
