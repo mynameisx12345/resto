@@ -179,7 +179,9 @@ export class ItemsComponent implements AfterViewInit, OnDestroy,OnInit{
   }
 
   viewImage(path:string){
-    const filename = path.split('/').pop();
+    
+    const separator =  path.charAt(7);
+    const filename = path.split(separator).pop();
     window.open(`${this.apiUrl}/images/items/${filename}`, "_blank");
   }
 

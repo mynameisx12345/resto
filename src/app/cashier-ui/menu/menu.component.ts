@@ -76,9 +76,10 @@ export class MenuComponent implements OnInit{
       (this.selectedSubCategory === '' ||(!!this.selectedSubCategory && this.selectedSubCategory === product.subcategoryName) ) &&
       (this.fgMenu.get('searchMenu').value === '' || (!!this.fgMenu.get('searchMenu').value && product.name.toUpperCase().includes(this.fgMenu.get('searchMenu').value.toUpperCase())))
     ).map((product)=>{
+      const separator =  product.imagePath.charAt(7);
       return {
         ...product,
-        imageLink: `${this.apiUrl}/images/items/${product.imagePath.split('/').pop()}`
+        imageLink: `${this.apiUrl}/images/items/${product.imagePath.split(separator).pop()}`
       }
     })
   }
