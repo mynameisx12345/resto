@@ -25,7 +25,6 @@ export class HeaderComponent implements OnInit {
   );
 
   currentUsr$ = this.userService.currentUser$;
-  ua = navigator.userAgent;
   isMobile = checkIfMobile();
   
   view$ = this.router.events.pipe(

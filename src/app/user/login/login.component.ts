@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, afterNextRender } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../user.service';
@@ -18,13 +18,29 @@ export class LoginComponent implements OnInit{
     private router: Router,
     private userSevice: UserService,
     private snackbar: MatSnackBar
-  ){}
+  ){
+    afterNextRender(()=>{
+     const currentUser = this.userSevice.getCurrentUser();
+     if(currentUser){
+      console.log('currentuser', currentUser)
+      switch(currentUser.userType){
+        case 'Kitchen' :
+          this.router.navigate(['/cashier/kitchen']);
+          break;
+        default:
+          this.router.navigate(['/cashier/menu']);
+          break;
+      }
+     }
+    })
+  }
 
   ngOnInit(): void {
     this.fgLogin = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     })
+
   }
 
   login(){

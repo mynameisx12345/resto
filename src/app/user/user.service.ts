@@ -32,6 +32,8 @@ export class UserService {
     if(currentUser){
       this.setCurrentUser(currentUser);
     }
+
+    return currentUser;
   }
 
 
