@@ -6,7 +6,7 @@
         </mat-select>
     </mat-form-field>
     <div *ngIf="cottageFc.value">
-        <qrcode *ngIf="(url$ | async) as url"  [qrdata]="url" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+        <qrcode [qrdata]="url" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
     </div>
     
 

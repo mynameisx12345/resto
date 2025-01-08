@@ -12,6 +12,9 @@ export class QrComponent implements OnInit {
   cottageFc = new FormControl('');
  serverIp =` ${environment.uiUrl}/customer/customer-home`;
 
+ url = '';
+
+
  url$ = this.cottageFc.valueChanges.pipe(
   startWith(''),
   map((cotVal)=>{
@@ -24,7 +27,9 @@ export class QrComponent implements OnInit {
   cottages = COTTAGES;
 
   ngOnInit(): void {
-    
+    this.url$.subscribe((cotVal)=>{
+      this.url = cotVal
+    })
   }
 
   
