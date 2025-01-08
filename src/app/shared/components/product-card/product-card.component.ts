@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-product-card',
@@ -49,7 +50,8 @@ export class ProductCardComponent {
   currentDialog?:MatDialogRef<any>;
   constructor(
     private readonly dialog: MatDialog,
-    private readonly snackbar: MatSnackBar
+    private readonly snackbar: MatSnackBar,
+    private readonly domSanitizer: DomSanitizer
   ){}
 
   openDialog(){
@@ -62,5 +64,9 @@ export class ProductCardComponent {
         this.addItem(res.price,res.size)
       }
     })
+  }
+
+  get sanitizedImage(){
+    return this.domSanitizer.bypassSecurityTrustUrl(this.image as string);
   }
 }
