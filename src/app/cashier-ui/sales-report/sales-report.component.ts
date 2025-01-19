@@ -148,7 +148,7 @@ export class SalesReportComponent implements AfterViewInit, OnDestroy{
         const detailsOnlyFilteredCat = detailsOnly.filter((det:any)=>{
           return ((filters.categories && filters.categories.length > 0) &&
             filters.categories.find((cat:any)=>cat.type==='cat' && cat.value===det.categoryId) &&
-            (!!det.subcategoryId && filters.categories.find((sub:any)=>sub.type==='sub' && sub.value===det.subcategoryId))
+            ((!!det.subcategoryId && filters.categories.find((sub:any)=>sub.type==='sub' && sub.value===det.subcategoryId)) || !(!!det.subcategoryId))
           ) || !filters.categories || (filters.categories && filters.categories.length <=0)
         })
         detailsOnlyFilteredCat.forEach((det:any)=>{

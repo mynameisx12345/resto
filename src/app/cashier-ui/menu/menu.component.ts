@@ -7,6 +7,7 @@ import { PRODUCTS } from '../../shared/constants/resto.constant';
 import { AdminService, Category, Item } from '../../admin/admin.service';
 import { environment } from '../../../environment/environment';
 import { User, UserService } from '../../user/user.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-menu',
@@ -19,7 +20,8 @@ export class MenuComponent implements OnInit{
     private readonly menuService: MenuListService,
     private readonly fb: FormBuilder,
     private readonly adminService: AdminService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly router: Router
   ){}
 
   currentUser$ = this.userService.currentUser$;
@@ -43,7 +45,9 @@ export class MenuComponent implements OnInit{
   categories$ = this.adminService.categories$.pipe(
     withLatestFrom(this.currentUser$),
     map(([categories, currentUser])=>{
-      return categories.filter(cat=>currentUser?.categoryAccess?.includes(cat.id))
+      return categories.filter(cat=>{
+        return (this.router.url === '/cashier/menu' &&currentUser?.categoryAccess?.includes(cat.id)) || this.router.url !== '/cashier/menu'
+      })
     })
   );
 
@@ -88,7 +92,12 @@ export class MenuComponent implements OnInit{
   filteredProducts() {
     return this.items.filter(
       (product) => product.categoryName === this.selectedCategory && 
-      (this.currentUser?.subcategoryAccess?.includes(product.subcategoryId) && 
+      ( ((this.router.url === '/cashier/menu' && 
+          ((!!product.subcategoryId &&
+            this.currentUser?.subcategoryAccess?.includes(product.subcategoryId))
+          || !(!!product.subcategoryId))
+          )
+         || this.router.url !== '/cashier/menu') && 
         ( this.selectedSubCategory === '' ||
           (!!this.selectedSubCategory && this.selectedSubCategory === product.subcategoryName) )) &&
       (this.fgMenu.get('searchMenu').value === '' || (!!this.fgMenu.get('searchMenu').value && product.name.toUpperCase().includes(this.fgMenu.get('searchMenu').value.toUpperCase())))
@@ -115,6 +124,8 @@ export class MenuComponent implements OnInit{
   }
 
   filterSubcategory(subcategories:any){
-    return subcategories.filter((sub:any)=> this.currentUser?.subcategoryAccess?.includes(sub.id))
+    return subcategories.filter((sub:any)=> {
+      return (this.router.url === '/cashier/menu' && this.currentUser?.subcategoryAccess?.includes(sub.id)) || this.router.url !=='/cashier/menu'
+    })
   }
 }
