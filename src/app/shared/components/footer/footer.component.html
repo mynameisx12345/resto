@@ -3,19 +3,19 @@
     class="cont flex flex-row gap-x-5 w-full h-full p-5 items-center justify-center"
     *ngIf="!(noFooter$ | async)"
   >
-    <button mat-fab color="accent" class="icon-color" aria-label="Home"  matTooltip="Home" (click)="gotoHome()" *ngIf="(currentUser$ | async)?.userType === 'Cashier' || (currentUser$ | async)?.userType === 'Administrator'">
+    <button mat-fab color="accent" class="icon-color" aria-label="Home"  matTooltip="Home" (click)="gotoHome()" *ngIf="pageExist(1)">
       <mat-icon>home</mat-icon>
     </button>
-    <button mat-fab color="accent" class="icon-color" matTooltip="Orders" (click)="gotoOrders()" *ngIf="(currentUser$ | async)?.userType === 'Cashier' || (currentUser$ | async)?.userType === 'Administrator'">
+    <button mat-fab color="accent" class="icon-color" matTooltip="Orders" (click)="gotoOrders()" *ngIf="pageExist(2)">
       <mat-icon>menu_book</mat-icon>
     </button>
-    <button mat-fab color="accent" class="icon-color" matTooltip="Kitchen" (click)="gotoKitchen()">
+    <button mat-fab color="accent" class="icon-color" matTooltip="Kitchen" (click)="gotoKitchen()" *ngIf="pageExist(3)">
       <mat-icon>emoji_food_beverage</mat-icon>
     </button>
-    <button mat-fab color="accent" class="icon-color" matTooltip="Sales Report" (click)="gotoSales()" *ngIf="(currentUser$ | async)?.userType === 'Cashier' || (currentUser$ | async)?.userType === 'Administrator' ">
+    <button mat-fab color="accent" class="icon-color" matTooltip="Sales Report" (click)="gotoSales()" *ngIf="pageExist(4)">
       <mat-icon>bar_chart</mat-icon>
     </button>
-    <button mat-fab color="accent" class="icon-color" matTooltip="Admin Settings" *ngIf="(currentUser$ | async)?.userType === 'Administrator'"
+    <button mat-fab color="accent" class="icon-color" matTooltip="Admin Settings" *ngIf="pageExist(5)"
     [matMenuTriggerFor]="adminMenu">
       <mat-icon>admin_panel_settings</mat-icon>
     </button>
@@ -31,6 +31,10 @@
       <button mat-menu-item (click)="goToLink('/admin/qr')">
         <mat-icon>qr_code</mat-icon>
         <span>QR Code</span>
+      </button>
+      <button mat-menu-item (click)="goToLink('/admin/add-user')">
+        <mat-icon>group_add</mat-icon>
+        <span>Users</span>
       </button>
     </mat-menu>
     <button mat-fab color="accent" class="icon-color" matTooltip="Logout" (click)="logout()">

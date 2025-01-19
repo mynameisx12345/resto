@@ -228,7 +228,8 @@ export class ItemsComponent implements AfterViewInit, OnDestroy,OnInit{
       tap((res)=>{
         this.adminService.getItems();
         this.snackbar.open(`Item ${item.name} is deleted.`,'',{
-          duration:2000
+          duration:2000,
+          verticalPosition:'top'
         })
 
       })

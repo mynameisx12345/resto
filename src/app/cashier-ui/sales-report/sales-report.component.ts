@@ -8,6 +8,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
+import { AdminService, Category } from '../../admin/admin.service';
 
 @Component({
   selector: 'app-sales-report',
@@ -23,11 +24,14 @@ export class SalesReportComponent implements AfterViewInit, OnDestroy{
 
   onDestroy$ = new Subject;
 
-  constructor(private readonly menuService: MenuListService){}
+  constructor(
+    private readonly menuService: MenuListService,
+    private readonly adminService: AdminService
+  ){}
 
   loadSales$ = new BehaviorSubject(false);
 
-  filters$ = new BehaviorSubject<{by:string, start:Date | null, end: Date | null}>({by: 'cottage',start: null, end:null});
+  filters$ = new BehaviorSubject<{by:string, start:Date | null, end: Date | null, categories:any}>({by: 'cottage',start: null, end:null, categories: null});
 
   columns$ = this.filters$.pipe(
     map((filters)=>{
@@ -37,7 +41,7 @@ export class SalesReportComponent implements AfterViewInit, OnDestroy{
       } else if(filters.by==='order'){
         res = {hdrId:'Order #', mode: 'Mode', grandTotal: 'Total', dttmOrder: 'Date/Time Ordered'}
       } else if(filters.by==='item'){
-        res = {itemName: 'Item', itemSize: 'Size', quantity: 'Qty.', price: 'Price', total:'Total'}
+        res = {itemName: 'Item', itemSize: 'Size', categoryName:'Category', subcategoryName:'Subcategory', quantity: 'Qty.', price: 'Price', total:'Total'}
       }
 
       return res;
@@ -48,6 +52,7 @@ export class SalesReportComponent implements AfterViewInit, OnDestroy{
     type: new FormControl<string | null>('cottage'),
     start: new FormControl<Date | null>(null),
     end: new FormControl<Date | null>(null),
+    categories: new FormControl<any>(null)
   });
 
   displayColumns$ = this.columns$.pipe(
@@ -62,20 +67,14 @@ export class SalesReportComponent implements AfterViewInit, OnDestroy{
     })
   )
 
+  categories$ = this.adminService.categories$;
+
   salesReport$ = this.menuService.getSalesReport().pipe(
     withLatestFrom(this.filters$),
     map(([sales,filters])=>{
 
       const startFilter = (data:any)=>{
         return data.filter((d:any)=>{
-          console.log('end12345',
-            moment(filters.end).format('YYYY/MM/DD'), 
-            moment(filters.start).format('YYYY/MM/DD'), 
-            moment(d.dttmOrder).format('YYYY/MM/DD'),
-            moment(filters.end).format('YYYY/MM/DD') >=
-            moment(d.dttmOrder).format('YYYY/MM/DD'),
-            moment(filters.start).format('YYYY/MM/DD') <=
-            moment(d.dttmOrder).format('YYYY/MM/DD'))
             
           return (!!filters.end ? (moment(filters.end).format('YYYY/MM/DD') >= moment(d.dttmOrder).format('YYYY/MM/DD')) : true) &&
             (!!filters.start  ? (moment(filters.start).format('YYYY/MM/DD') <= moment(d.dttmOrder).format('YYYY/MM/DD')) : true)
@@ -109,7 +108,10 @@ export class SalesReportComponent implements AfterViewInit, OnDestroy{
           total: sale.total,
           categoryName: sale.categoryName,
           hdrStatus: sale.hdrStatus,
-          dtlId: sale.dtlId
+          dtlId: sale.dtlId,
+          categoryId: sale.categoryId,
+          subcategoryId: sale.subcategoryId,
+          subcategoryName: sale.subcategoryName
         }
       }).filter((sale:any)=>sale.hdrStatus === 'Paid')
 
@@ -142,7 +144,14 @@ export class SalesReportComponent implements AfterViewInit, OnDestroy{
           })
         })
       } else if(filters.by==='item'){
-        detailsOnly.forEach((det:any)=>{
+        //filter category
+        const detailsOnlyFilteredCat = detailsOnly.filter((det:any)=>{
+          return ((filters.categories && filters.categories.length > 0) &&
+            filters.categories.find((cat:any)=>cat.type==='cat' && cat.value===det.categoryId) &&
+            (!!det.subcategoryId && filters.categories.find((sub:any)=>sub.type==='sub' && sub.value===det.subcategoryId))
+          ) || !filters.categories || (filters.categories && filters.categories.length <=0)
+        })
+        detailsOnlyFilteredCat.forEach((det:any)=>{
           const foundDet = result.find((res:any)=>res.itemId === det.itemId && res.price === det.price);
           if(foundDet){
             foundDet.quantity += Number(det.quantity);
@@ -242,6 +251,18 @@ export class SalesReportComponent implements AfterViewInit, OnDestroy{
         this.loadSales$.next(true)
       })
     ).subscribe()
+
+    this.range.controls.categories.valueChanges.pipe(
+      takeUntil(this.onDestroy$),
+      tap((selected)=>{
+        this.filters$.next({...this.filters$.value, categories:selected})
+        this.loadSales$.next(true)
+      })
+    ).subscribe();
+  }
+
+  checkIfParentSelected(category:Category){
+    return this.range.controls.categories.value?.find((cat:any)=>cat.type === 'cat' && cat.value === category.id)
   }
 
   ngOnDestroy(): void {

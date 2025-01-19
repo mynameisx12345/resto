@@ -8,6 +8,31 @@
         <mat-option value="order">By Order</mat-option>
       </mat-select>
     </mat-form-field>
+    <mat-form-field *ngIf="range.controls.type.value ==='item'">
+      <mat-label>Categories</mat-label>
+      <mat-select formControlName="categories" multiple>
+        <div *ngFor="let category of categories$ | async" class="category">
+          <mat-option [value]="{type:'cat', value: category.id, hasSubs:category.subcategories.length > 0}">{{category.category}}</mat-option>
+          <div class="subcategory">
+            <mat-option *ngFor="let subcategory of category.subcategories" [value]="{type:'sub', value: subcategory.id, hasSubs:false}"
+              [disabled]="!checkIfParentSelected(category)">{{subcategory.subcategory}}</mat-option>
+          </div>
+          
+          <!-- <mat-form-field>
+            <mat-select multiple>
+              <mat-option *ngFor="let subcategory of category.subcategories" [value]="subcategory.id">{{subcategory.subcategory}}</mat-option>
+            </mat-select>
+          </mat-form-field> -->
+        </div>
+        <!-- <mat-optgroup *ngFor="let category of categories$ | async">
+          <div class="category">
+            <mat-checkbox class="italic category-title">{{category.category}}</mat-checkbox>
+          </div>
+          
+          <mat-option *ngFor="let subcategory of category.subcategories" [value]="subcategory.id">{{subcategory.subcategory}}</mat-option>
+        </mat-optgroup> -->
+      </mat-select>
+    </mat-form-field>
     <mat-form-field>
       <mat-label>Enter a date range</mat-label>
       <mat-date-range-input [rangePicker]="picker">

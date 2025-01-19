@@ -2,7 +2,7 @@ import { Component, OnInit, afterNextRender } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { UserService } from '../../../user/user.service';
-import { checkIfMobile } from '../../util';
+import { DeviceDetectorService } from 'ngx-device-detector';
 
 @Component({
   selector: 'app-header',
@@ -25,7 +25,7 @@ export class HeaderComponent implements OnInit {
   );
 
   currentUsr$ = this.userService.currentUser$;
-  isMobile = checkIfMobile();
+  isMobile = this.deviceService.isMobile();
   
   view$ = this.router.events.pipe(
     filter((event)=>event instanceof NavigationEnd),
@@ -51,7 +51,8 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private readonly router: Router,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly deviceService: DeviceDetectorService
   ){
     afterNextRender(()=>{
       this.userService.getCurrentUser();

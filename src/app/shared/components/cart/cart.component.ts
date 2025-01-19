@@ -187,7 +187,7 @@ export class CartComponent implements AfterViewInit, OnDestroy {
     });
 
     if(this.router.url==='/cashier/menu'){
-      this.router.navigate(['/cashier/orders']);
+     // this.router.navigate(['/cashier/orders']);
 
     } else {
       this.router.navigate(['/customer/customer-home'],{queryParams: {id:this.customerCottage[0].id}});

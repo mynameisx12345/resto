@@ -1,5 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, tap } from 'rxjs';
+import { environment } from '../../environment/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -8,16 +10,31 @@ export class UserService {
   currentUser = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUser.asObservable();
 
-  constructor() { 
+  apiUrl = environment.apiUrl;
+
+  constructor(
+    private readonly http: HttpClient
+  ) { 
     
   }
 
   login(username:string, password:string){
-    let findUser= USERS.filter((user)=>user.username===username && user.password === password)
-    if(findUser.length > 0){
-      this.setCurrentUser(findUser[0])
-    }
-     return findUser
+    // let findUser= USERS.filter((user)=>user.username===username && user.password === password)
+    // if(findUser.length > 0){
+    //   this.setCurrentUser(findUser[0])
+    // }
+    //  return findUser
+
+     return this.http.post(`${this.apiUrl}/users/login`, {username:username, password:password}).pipe(
+      tap((user:any)=>{
+
+        if(user.length>0){
+          console.log('user', user[0])
+          this.setCurrentUser(user[0])
+        }
+        
+      })
+     )
   }
 
   setCurrentUser(user:User | null){
@@ -40,9 +57,14 @@ export class UserService {
 }
 
 export interface User {
+  id?:any,
   username: string,
   password: string,
-  userType: string
+  userType?: string,
+  name?: string,
+  pageAccess?: number[],
+  categoryAccess?: number[],
+  subcategoryAccess?:number[]
 }
 
 const USERS:User[] = [

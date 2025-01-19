@@ -1,11 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MenuListService } from '../menu-list.service';
-import { take, tap } from 'rxjs';
+import { map, switchMap, take, takeUntil, tap, withLatestFrom } from 'rxjs';
 import { Orders } from '../menu-list.model';
 import { FormBuilder } from '@angular/forms';
 import { PRODUCTS } from '../../shared/constants/resto.constant';
 import { AdminService, Category, Item } from '../../admin/admin.service';
 import { environment } from '../../../environment/environment';
+import { User, UserService } from '../../user/user.service';
 
 @Component({
   selector: 'app-menu',
@@ -17,9 +18,12 @@ export class MenuComponent implements OnInit{
   constructor(
     private readonly menuService: MenuListService,
     private readonly fb: FormBuilder,
-    private readonly adminService: AdminService
+    private readonly adminService: AdminService,
+    private readonly userService: UserService
   ){}
-  
+
+  currentUser$ = this.userService.currentUser$;
+  currentUser?:User
 
   selectedCategory = '';
   selectedSubCategory = '';
@@ -36,7 +40,12 @@ export class MenuComponent implements OnInit{
     'Desserts': 'icecream'
   }
 
-  categories$ = this.adminService.categories$;
+  categories$ = this.adminService.categories$.pipe(
+    withLatestFrom(this.currentUser$),
+    map(([categories, currentUser])=>{
+      return categories.filter(cat=>currentUser?.categoryAccess?.includes(cat.id))
+    })
+  );
 
   subCategories= [
     { label: 'Pizza', icon: 'dinner_dining', category: 'Food'},
@@ -68,12 +77,20 @@ export class MenuComponent implements OnInit{
         this.items=items;
       })
     ).subscribe();
+
+    this.currentUser$.pipe(
+      tap((user)=>{
+        this.currentUser = user as User;
+      })
+    ).subscribe();
   }
 
   filteredProducts() {
     return this.items.filter(
       (product) => product.categoryName === this.selectedCategory && 
-      (this.selectedSubCategory === '' ||(!!this.selectedSubCategory && this.selectedSubCategory === product.subcategoryName) ) &&
+      (this.currentUser?.subcategoryAccess?.includes(product.subcategoryId) && 
+        ( this.selectedSubCategory === '' ||
+          (!!this.selectedSubCategory && this.selectedSubCategory === product.subcategoryName) )) &&
       (this.fgMenu.get('searchMenu').value === '' || (!!this.fgMenu.get('searchMenu').value && product.name.toUpperCase().includes(this.fgMenu.get('searchMenu').value.toUpperCase())))
     ).map((product)=>{
       const separator =  product.imagePath.charAt(7);
@@ -94,5 +111,10 @@ export class MenuComponent implements OnInit{
   changeCategory(category:Category){
     this.selectedCategory = category.category; 
     this.selectedSubCategory=''
+    this.fgMenu.patchValue({searchMenu:''})
+  }
+
+  filterSubcategory(subcategories:any){
+    return subcategories.filter((sub:any)=> this.currentUser?.subcategoryAccess?.includes(sub.id))
   }
 }

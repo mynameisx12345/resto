@@ -8,6 +8,7 @@ import { ItemsComponent } from './items/items.component';
 import { CategoriesComponent } from './categories/categories.component';
 import { ModulesModule } from '../shared/modules/modules.module';
 import { ComponentsModule } from '../shared/components/components.module';
+import { AddUserComponent } from './add-user/add-user.component';
 const route: Routes = [
   {
     path: 'qr',
@@ -20,6 +21,10 @@ const route: Routes = [
   {
     path: 'categories',
     component: CategoriesComponent
+  },
+  {
+    path: 'add-user',
+    component: AddUserComponent
   }
 ]
 
@@ -28,7 +33,8 @@ const route: Routes = [
     QrComponent,
     AdminPanelComponent,
     ItemsComponent,
-    CategoriesComponent
+    CategoriesComponent,
+    AddUserComponent
   ],
   imports: [
     QRCodeModule,

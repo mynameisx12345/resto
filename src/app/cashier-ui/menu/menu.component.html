@@ -11,7 +11,7 @@
       </button>
       <mat-menu #menu="matMenu">
         <button mat-menu-item 
-          *ngFor="let subcategory of category.subcategories"
+          *ngFor="let subcategory of filterSubcategory(category.subcategories)"
           (click)="selectedSubCategory = subcategory.subcategory">
           <!-- <mat-icon>{{category?.icon}}</mat-icon> -->
           {{subcategory.subcategory}}

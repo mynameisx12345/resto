@@ -1,0 +1,141 @@
+<div class="user flex flex-col justify-start items-start">
+    <div class="w-full flex flex-row justify-between items-center">
+        <button mat-raised-button color="accent" (click)="openDialog()">Add User</button>
+        <mat-form-field>
+            <mat-label>Filter</mat-label>
+            <input matInput (keyup)="applyFilter($event)" #input>
+          </mat-form-field>
+    </div>
+    <table mat-table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+            <td mat-cell *matCellDef="let element">
+                {{element.id}}
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="username">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Username</th>
+            <td mat-cell *matCellDef="let element">
+                {{element.username}}
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell *matCellDef="let element">
+                {{element.name}}
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="menu">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let element">
+                <button mat-icon-button [matMenuTriggerFor]="subMenu"><mat-icon>more_vert</mat-icon></button>
+                <mat-menu #subMenu="matMenu">
+                    <button mat-menu-item (click)="editUser(element)">
+                        <mat-icon>edit</mat-icon>
+                        Edit
+                    </button>
+                    <button mat-menu-item (click)="removeUser(element)">
+                        <mat-icon>delete</mat-icon>
+                        Remove
+                    </button>
+                </mat-menu>
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[10, 25, 100]" aria-label="Select page of items"></mat-paginator>
+</div>
+
+<ng-template #addUser>
+    <div class="add-user m-5">
+        <div [formGroup]="fgUser" class="flex flex-col">
+            <mat-form-field>
+                <mat-label>Username</mat-label>
+                <input matInput formControlName="username">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Password</mat-label>
+                <input matInput formControlName="password" type="password">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Page Access</mat-label>
+                <mat-chip-grid #pageChipGrid>
+                    <mat-chip-row *ngFor="let access of (selectedPages$ | async)"
+                        (removed)="removePage(access.id)">
+                        {{access.page}}
+                        <button matChipRemove>
+                          <mat-icon>cancel</mat-icon>
+                        </button>
+                      </mat-chip-row>
+                </mat-chip-grid>
+                <input
+                    name="currentPage"
+                    placeholder="Add Page Access..."
+                    #pageInput
+                    [matChipInputFor]="pageChipGrid"
+                    [matAutocomplete]="pageAuto"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                />
+                <mat-autocomplete #pageAuto="matAutocomplete" (optionSelected)="selectPage($event)">
+                    <mat-option *ngFor="let page of (pages$ | async)" [value]="page.id">{{page.page}}</mat-option>
+                    </mat-autocomplete>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Category Access</mat-label>
+                <mat-chip-grid #catChipGrid>
+                    <mat-chip-row *ngFor="let access of (selectedCategories$ | async)"
+                        (removed)="removeCategory(access.id)">
+                        {{access.category}}
+                        <button matChipRemove>
+                          <mat-icon>cancel</mat-icon>
+                        </button>
+                      </mat-chip-row>
+                </mat-chip-grid>
+                <input
+                    name="currentCategory"
+                    placeholder="Add Category Access..."
+                    #pageInput
+                    [matChipInputFor]="catChipGrid"
+                    [matAutocomplete]="catAuto"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                />
+                <mat-autocomplete #catAuto="matAutocomplete" (optionSelected)="selectCategory($event)">
+                    <mat-option *ngFor="let category of (filteredCategories$ | async)" [value]="category.id">{{category.category}}</mat-option>
+                    </mat-autocomplete>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Subcategory Access</mat-label>
+                <mat-chip-grid #subChipGrid>
+                    <mat-chip-row *ngFor="let access of (selectedSubcategories$ | async)"
+                        (removed)="removeSubCategory(access.id)">
+                        {{access.subcategory}}
+                        <button matChipRemove>
+                          <mat-icon>cancel</mat-icon>
+                        </button>
+                      </mat-chip-row>
+                </mat-chip-grid>
+                <input
+                    name="currentCategory"
+                    placeholder="Add Subcategory Access..."
+                    #pageInput
+                    [matChipInputFor]="subChipGrid"
+                    [matAutocomplete]="subAuto"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                />
+                <mat-autocomplete #subAuto="matAutocomplete" (optionSelected)="selectSubcategory($event)">
+                    <mat-option *ngFor="let category of (filteredSubcategories$ | async)" [value]="category.id">{{category.subcategory}}</mat-option>
+                    </mat-autocomplete>
+            </mat-form-field>
+            <div class="flex flex-row justify-between mt-5">
+                <button mat-raised-button color="primary" [disabled]="!fgUser.valid" (click)="saveUser()">Save</button>
+                <button mat-raised-button type="button" color="warn" (click)="currentDialog?.close(false); resetForm()">Close</button>
+            </div>
+        </div>
+       
+    </div>
+</ng-template>

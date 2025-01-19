@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter, map, startWith } from 'rxjs';
+import { filter, map, startWith, take, tap } from 'rxjs';
 import { UserService } from '../../../user/user.service';
-import { checkIfMobile } from '../../util';
+import { DeviceDetectorService } from 'ngx-device-detector';
 
 @Component({
   selector: 'app-footer',
@@ -26,11 +26,9 @@ export class FooterComponent {
       
 
       const yesWithout = withoutHeaders.some((url)=>{
-        console.log('events1', url, event.url.search(url))
         return event.url.search(url) >= 0
       })
 
-      console.log('events', event.url, yesWithout)
 
       return yesWithout;
     })
@@ -40,16 +38,30 @@ export class FooterComponent {
 
   currentUser$ = this.userService.currentUser$;
 
-  isMobile = checkIfMobile();
+  pages?:number[] = []
+
+  isMobile = this.deviceService.isMobile();
 
   constructor(
     private readonly router: Router,
     private readonly userService: UserService,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private readonly deviceService: DeviceDetectorService
   ){
     this.route.url.subscribe((url)=>{
       console.log('url', url)
     })
+
+    this.currentUser$.pipe(
+      tap((user)=>{
+        console.log('curuser',user)
+        this.pages = user?.pageAccess
+      })
+    ).subscribe()
+  }
+
+  pageExist(pageId:number){
+    return this.pages?.find(page=>page === pageId)
   }
 
   gotoOrders(){

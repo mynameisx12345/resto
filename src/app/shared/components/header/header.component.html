@@ -7,7 +7,7 @@
     </div>
   </div>
   <div class="view flex flex-col items-end mr-10">
-    <div class="user-info flex flex-row items-end justify-end">{{(currentUsr$  | async)?.userType}}</div>
+    <div class="user-info flex flex-row items-end justify-end">{{(currentUsr$  | async)?.name}}</div>
     <div class="controls" *ngIf="!isMobile">
       <app-footer></app-footer>
     </div>

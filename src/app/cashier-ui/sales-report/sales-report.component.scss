@@ -2,3 +2,15 @@
   min-height: calc(100vh - 270px);
 
 }
+
+.category{
+  position:relative;
+  .category-title{
+    font-size: 29px !important;
+    left: -20px;
+    font-weight: bold !important;
+  }
+  .subcategory{
+    margin-left:20px;
+  }
+}

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { checkIfMobile } from './shared/util';
+import { Component, afterNextRender } from '@angular/core';
+import { DeviceDetectorService } from 'ngx-device-detector'; 
 
 @Component({
   selector: 'app-root',
@@ -8,5 +8,11 @@ import { checkIfMobile } from './shared/util';
 })
 export class AppComponent {
   title = 'resto-mama-ui';
-  isMobile = checkIfMobile();
+  isMobile = this.deviceService.isMobile();;
+
+  constructor(
+    private deviceService: DeviceDetectorService
+  ){
+   
+  }
 }

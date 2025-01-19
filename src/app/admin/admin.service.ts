@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { generateId } from '../shared/util';
+import { User } from '../user/user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,11 +24,15 @@ export class AdminService {
   items = new BehaviorSubject<Item[]>([]);
   items$ = this.items.asObservable();
 
+  users = new BehaviorSubject<User[]>([]);
+  users$ = this.users.asObservable();
+
   constructor(
     private readonly http: HttpClient
   ) { 
     this.getCategories();
     this.getItems();
+    this.getUsers();
   }
 
   setCategory(category: Category){
@@ -111,6 +116,34 @@ export class AdminService {
 
   addPrices(prices:any){
     return this.http.post(`${this.apiUrl}/items/price`,prices);
+  }
+
+  setUsers(users:User[]){
+    this.users.next(users);
+  }
+
+  getUsers(){
+    return this.http.get(`${this.apiUrl}/users`).pipe(
+      tap((users:any)=>{
+        this.setUsers(users);
+      })
+    ).subscribe();
+  }
+
+  saveUser(user:User){
+    return this.http.post(`${this.apiUrl}/users`,user).pipe(
+      tap((res)=>{
+        
+      })
+    )
+  }
+
+  removeUser(user:User){
+    return this.http.delete(`${this.apiUrl}/users/${user.id}`).pipe(
+      tap(()=>{
+        this.getUsers();
+      })
+    )
   }
 }
 
